@@ -1,0 +1,504 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Retro Pixel Arcade</title>
+    <!-- 폰트어썸 아이콘 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* --- 폰트 및 변수 설정 --- */
+        @font-face {
+            font-family: 'DungGeunMo';
+            src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_six@1.2/DungGeunMo.woff') format('woff');
+            font-weight: normal;
+            font-style: normal;
+        }
+
+        :root {
+            --bg-color: #1a1a2e;
+            --primary-color: #e94560;
+            --secondary-color: #0f3460;
+            --neon-blue: #00fff5;
+            --neon-pink: #ff00ff;
+            --neon-green: #39ff14;
+            --text-color: #ffffff;
+            --card-bg: #16213e;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: #050505;
+            color: var(--text-color);
+            font-family: 'DungGeunMo', monospace;
+            overflow-x: hidden;
+            min-height: 100vh;
+            position: relative;
+        }
+
+        /* --- CRT 스캔라인 효과 (레트로 감성 핵심) --- */
+        body::after {
+            content: " ";
+            display: block;
+            position: fixed;
+            top: 0;
+            left: 0;
+            bottom: 0;
+            right: 0;
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
+            z-index: 999;
+            background-size: 100% 2px, 3px 100%;
+            pointer-events: none;
+        }
+
+        /* --- 레이아웃 --- */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* --- 헤더 영역 --- */
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 0;
+            border-bottom: 4px solid var(--secondary-color);
+            margin-bottom: 40px;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        .logo-area {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .logo-icon {
+            font-size: 2.5rem;
+            color: var(--neon-pink);
+            animation: flicker 1.5s infinite alternate;
+        }
+
+        .site-title {
+            font-size: 2rem;
+            color: var(--neon-blue);
+            text-shadow: 2px 2px var(--primary-color);
+            letter-spacing: 2px;
+        }
+
+        /* 프로필 영역 스타일 */
+        .profile-area {
+            display: flex;
+            align-items: center;
+            background: var(--card-bg);
+            padding: 10px 20px;
+            border: 2px solid var(--neon-green);
+            box-shadow: 0 0 10px var(--neon-green);
+            border-radius: 4px;
+            text-decoration: none; /* 링크 밑줄 제거 */
+            cursor: pointer;       /* 클릭 커서 */
+            transition: all 0.3s;
+        }
+
+        .profile-area:hover {
+            background-color: var(--secondary-color);
+            box-shadow: 0 0 20px var(--neon-green);
+            transform: scale(1.02);
+        }
+
+        /* 아이콘 스타일 수정: 네온 블루 효과 적용 */
+        .avatar {
+            width: 50px;
+            height: 50px;
+            background-color: #000; /* 배경을 검정으로 변경 */
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            margin-right: 15px;
+            border: 2px solid var(--neon-blue); /* 테두리 네온 블루 */
+            color: var(--neon-blue);            /* 아이콘 네온 블루 */
+            box-shadow: 0 0 8px var(--neon-blue); /* 발광 효과 추가 */
+        }
+
+        .user-info {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .username {
+            font-size: 1.1rem;
+            color: var(--neon-green);
+            margin-bottom: 5px;
+        }
+
+        .credits {
+            font-size: 0.9rem;
+            color: #ffd700; /* Gold */
+        }
+
+        /* --- 메인 컨텐츠 (게임 그리드) --- */
+        .main-content {
+            padding: 10px;
+        }
+
+        .section-title {
+            font-size: 1.5rem;
+            color: white;
+            margin-bottom: 30px;
+            text-align: center;
+            position: relative;
+            display: inline-block;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        .section-title::after {
+            content: '';
+            display: block;
+            width: 100%;
+            height: 4px;
+            background-color: var(--primary-color);
+            margin-top: 10px;
+            box-shadow: 0 0 10px var(--primary-color);
+        }
+
+        .game-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 30px;
+        }
+
+        /* 게임 카드 스타일 */
+        .game-card {
+            background-color: var(--card-bg);
+            border: 4px solid var(--secondary-color);
+            position: relative;
+            transition: transform 0.2s, box-shadow 0.2s;
+            overflow: hidden;
+            cursor: pointer;
+        }
+
+        .game-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--neon-pink);
+            box-shadow: 0 0 15px var(--neon-pink);
+        }
+
+        .game-thumbnail {
+            height: 180px;
+            background-color: #000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            border-bottom: 2px solid var(--secondary-color);
+        }
+
+        .game-thumbnail i {
+            font-size: 4rem;
+            color: #555;
+            transition: color 0.3s;
+        }
+
+        .game-card:hover .game-thumbnail i {
+            color: var(--neon-blue);
+            animation: bounce 0.5s infinite alternate;
+        }
+
+        .game-info {
+            padding: 20px;
+            text-align: center;
+        }
+
+        .game-title {
+            font-size: 1.2rem;
+            margin-bottom: 10px;
+            color: white;
+        }
+
+        .game-genre {
+            display: inline-block;
+            background-color: var(--primary-color);
+            color: white;
+            padding: 4px 8px;
+            font-size: 0.8rem;
+            border-radius: 4px;
+            margin-bottom: 15px;
+        }
+
+        .play-btn {
+            display: block;
+            width: 100%;
+            padding: 10px;
+            background-color: transparent;
+            border: 2px solid var(--neon-green);
+            color: var(--neon-green);
+            font-family: 'DungGeunMo', monospace;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-transform: uppercase;
+        }
+
+        .play-btn:hover {
+            background-color: var(--neon-green);
+            color: #000;
+            box-shadow: 0 0 10px var(--neon-green);
+        }
+
+        /* --- 모달 (게임 실행 시뮬레이션) --- */
+        .modal-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+        }
+
+        .modal-content {
+            background: #111;
+            border: 4px solid var(--neon-blue);
+            padding: 40px;
+            text-align: center;
+            max-width: 500px;
+            width: 90%;
+            box-shadow: 0 0 20px var(--neon-blue);
+            position: relative;
+        }
+
+        .close-modal {
+            position: absolute;
+            top: 10px;
+            right: 15px;
+            font-size: 2rem;
+            color: #fff;
+            cursor: pointer;
+        }
+
+        .insert-coin-anim {
+            font-size: 1.5rem;
+            color: var(--neon-pink);
+            animation: blink 0.8s infinite;
+            margin: 20px 0;
+        }
+
+        /* --- 푸터 --- */
+        footer {
+            text-align: center;
+            padding: 40px 0;
+            color: #666;
+            font-size: 0.8rem;
+            margin-top: 50px;
+            border-top: 2px dashed #333;
+        }
+
+        /* --- 애니메이션 정의 --- */
+        @keyframes flicker {
+            0%, 19%, 21%, 23%, 25%, 54%, 56%, 100% { opacity: 1; text-shadow: 0 0 10px var(--neon-pink); }
+            20%, 24%, 55% { opacity: 0.5; text-shadow: none; }
+        }
+
+        @keyframes bounce {
+            from { transform: translateY(0); }
+            to { transform: translateY(-10px); }
+        }
+
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0; }
+        }
+
+        /* 반응형 처리 */
+        @media (max-width: 768px) {
+            header {
+                flex-direction: column;
+                text-align: center;
+            }
+            .profile-area {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <!-- 상단 헤더: 로고 및 프로필 -->
+    <header>
+        <div class="logo-area">
+            <i class="fas fa-gamepad logo-icon"></i>
+            <div class="site-title">PIXEL ARCADE</div>
+        </div>
+        
+        <!-- 프로필 영역을 링크(a 태그)로 변경했습니다. href에 원하는 주소를 입력하세요. -->
+        <a href="https://github.com" target="_blank" class="profile-area">
+            <div class="avatar">
+                <i class="fas fa-user-astronaut"></i>
+            </div>
+            <div class="user-info">
+                <div class="username">PLAYER_1</div>
+                <div class="credits">COIN: <span id="coin-count">10</span> 🪙</div>
+            </div>
+        </a>
+    </header>
+
+    <!-- 메인 컨텐츠: 게임 그리드 -->
+    <main class="main-content">
+        <h2 class="section-title">INSERT COIN TO PLAY</h2>
+        
+        <!-- 자바스크립트로 게임 카드가 여기에 동적으로 추가됩니다 -->
+        <div class="game-grid" id="game-grid">
+            <!-- Game Cards will be rendered here -->
+        </div>
+    </main>
+
+    <footer>
+        <p>© 2024 RETRO PIXEL ARCADE. PRESS START BUTTON.</p>
+    </footer>
+</div>
+
+<!-- 게임 실행 모달 -->
+<div class="modal-overlay" id="game-modal">
+    <div class="modal-content">
+        <span class="close-modal" id="close-modal">&times;</span>
+        <h2 id="modal-title" style="color: var(--neon-green); margin-bottom: 20px;">GAME TITLE</h2>
+        <div class="insert-coin-anim">INSERT COIN...</div>
+        <p style="margin-bottom: 20px;">게임을 불러오는 중입니다...</p>
+        <div style="font-size: 3rem; color: var(--secondary-color);">
+            <i class="fas fa-spinner fa-spin"></i>
+        </div>
+        <button class="play-btn" style="margin-top: 30px;" onclick="closeGameModal()">돌아가기</button>
+    </div>
+</div>
+
+<script>
+    // 게임 데이터
+    const games = [
+        { id: 1, title: "갤럭시 인베이더", genre: "슈팅", icon: "fa-rocket", color: "#e94560", url: "https://www.google.com/search?q=galaxy+invader+game" },
+        { id: 2, title: "팩맨 어드벤처", genre: "아케이드", icon: "fa-ghost", color: "#f9d71c", url: "https://www.google.com/search?q=pacman+game" },
+        { id: 3, title: "스트리트 파이터 II", genre: "격투", icon: "fa-hand-rock", color: "#39ff14", url: "https://www.google.com/search?q=street+fighter+2+game" },
+        { id: 4, title: "테트리스 블록", genre: "퍼즐", icon: "fa-cubes", color: "#00fff5", url: "https://www.google.com/search?q=tetris+game" },
+        { id: 5, title: "동키콩 점프", genre: "플랫폼", icon: "fa-dungeon", color: "#ff9900", url: "https://www.google.com/search?q=donkey+kong+game" },
+        { id: 6, title: "1945 스트라이커", genre: "비행", icon: "fa-plane", color: "#ff00ff", url: "https://www.google.com/search?q=1945+strikers+game" },
+        { id: 7, title: "버블 보블", genre: "아케이드", icon: "fa-dragon", color: "#8be9fd", url: "https://www.google.com/search?q=bubble+bobble+game" },
+        { id: 8, title: "메탈 슬러그", genre: "액션", icon: "fa-bomb", color: "#ff5555", url: "https://www.google.com/search?q=metal+slug+game" },
+    ];
+
+    const gridContainer = document.getElementById('game-grid');
+    const coinDisplay = document.getElementById('coin-count');
+    const modal = document.getElementById('game-modal');
+    const modalTitle = document.getElementById('modal-title');
+    const closeModalBtn = document.getElementById('close-modal');
+
+    let coins = 10;
+
+    // 게임 카드 렌더링 함수
+    function renderGames() {
+        gridContainer.innerHTML = '';
+        games.forEach(game => {
+            const card = document.createElement('div');
+            card.className = 'game-card';
+            
+            // 호버 시 아이콘 색상을 동적으로 변경하기 위해 스타일 주입
+            // onclick 이벤트에 url 파라미터 추가
+            card.innerHTML = `
+                <div class="game-thumbnail">
+                    <i class="fas ${game.icon}"></i>
+                </div>
+                <div class="game-info">
+                    <div class="game-genre">${game.genre}</div>
+                    <div class="game-title">${game.title}</div>
+                    <button class="play-btn" onclick="playGame('${game.title}', '${game.url}')">START GAME</button>
+                </div>
+            `;
+            gridContainer.appendChild(card);
+        });
+    }
+
+    // 게임 시작 함수 (URL 파라미터 추가)
+    window.playGame = function(title, url) {
+        if (coins > 0) {
+            coins--;
+            updateCoins();
+            modalTitle.innerText = title;
+            modal.style.display = 'flex';
+            
+            // 오디오 효과 시뮬레이션
+            console.log("Coin Inserted Sound Effect");
+
+            // 1.5초 후 게임 URL 열기 (새 탭)
+            setTimeout(() => {
+                window.open(url, '_blank');
+                modal.style.display = 'none'; // 모달 닫기
+            }, 1500);
+
+        } else {
+            alert("코인이 부족합니다! (새로고침하여 코인을 충전하세요)");
+        }
+    }
+
+    // 코인 업데이트 UI
+    function updateCoins() {
+        coinDisplay.innerText = coins;
+        // 코인이 줄어들 때 빨간색으로 깜빡임 효과
+        coinDisplay.style.color = 'red';
+        setTimeout(() => {
+            coinDisplay.style.color = '#ffd700';
+        }, 300);
+    }
+
+    // 모달 닫기
+    closeModalBtn.onclick = function() {
+        modal.style.display = 'none';
+    }
+
+    window.closeGameModal = function() {
+        modal.style.display = 'none';
+    }
+
+    // 모달 배경 클릭 시 닫기
+    window.onclick = function(event) {
+        if (event.target == modal) {
+            modal.style.display = 'none';
+        }
+    }
+
+    // 초기 실행
+    document.addEventListener('DOMContentLoaded', () => {
+        renderGames();
+        
+        // 레트로 타이핑 효과 (헤더 타이틀)
+        const titleText = "PIXEL ARCADE";
+        const titleElement = document.querySelector('.site-title');
+        let i = 0;
+        titleElement.innerText = "";
+        
+        function typeWriter() {
+            if (i < titleText.length) {
+                titleElement.innerText += titleText.charAt(i);
+                i++;
+                setTimeout(typeWriter, 150);
+            }
+        }
+        typeWriter();
+    });
+
+</script>
+
+</body>
+</html>

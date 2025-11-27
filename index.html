@@ -417,6 +417,9 @@
             const card = document.createElement('div');
             card.className = 'game-card';
             
+            // 카드 전체에 클릭 이벤트 연결 (이제 카드를 클릭하면 실행됩니다)
+            card.onclick = () => playGame(game.title, game.url);
+
             // 변경점: 아이콘 클래스를 game.icon 그대로 사용하도록 수정 (${game.icon})
             card.innerHTML = `
                 <div class="game-thumbnail">
@@ -425,7 +428,8 @@
                 <div class="game-info">
                     <div class="game-genre">${game.genre}</div>
                     <div class="game-title">${game.title}</div>
-                    <button class="play-btn" onclick="playGame('${game.title}', '${game.url}')">START GAME</button>
+                    <!-- 버튼의 중복 onclick 제거 (상위 카드의 이벤트가 실행됨) -->
+                    <button class="play-btn">START GAME</button>
                 </div>
             `;
             gridContainer.appendChild(card);

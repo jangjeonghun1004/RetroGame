@@ -2,7 +2,7 @@
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>Retro Brick Breaker Console</title>
     <!-- 구글 폰트 -->
     <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
@@ -25,8 +25,13 @@
             flex-direction: column;
             align-items: center;
             justify-content: center;
+            /* 모바일 브라우저 UI 대응을 위한 dvh 사용 */
             height: 100vh;
+            height: 100dvh; 
             overflow: hidden;
+            /* 노치 디자인 대응 */
+            padding-top: env(safe-area-inset-top);
+            padding-bottom: env(safe-area-inset-bottom);
         }
 
         /* --- 콘솔 본체 디자인 --- */
@@ -34,31 +39,34 @@
             background-color: #e0e0e0;
             width: 100%;
             max-width: 420px;
-            height: 98vh;
+            /* 높이 유동성 확보 (상하단 여유) */
+            height: 96%; 
+            height: calc(100dvh - 10px); 
             max-height: 850px;
-            border-radius: 20px;
-            padding: 15px;
-            padding-bottom: 10px;
+            border-radius: 15px;
+            padding: 10px; /* 패딩 축소 */
+            padding-bottom: 5px;
             display: flex;
             flex-direction: column;
             box-shadow: 
-                0 0 0 5px #d0d0d0,
-                0 20px 50px rgba(0,0,0,0.5),
+                0 0 0 2px #d0d0d0, /* 테두리 두께 축소 */
+                0 10px 20px rgba(0,0,0,0.5),
                 inset 0 -5px 10px rgba(0,0,0,0.1);
             position: relative;
         }
 
-        /* --- 화면 영역 --- */
+        /* --- 화면 영역 (남는 공간 모두 차지) --- */
         .screen-bezel {
             background-color: #111;
-            border-radius: 10px;
-            padding: 10px;
-            flex: 1;
+            border-radius: 8px;
+            padding: 8px;
+            flex: 1; /* 가변 높이 */
+            min-height: 40%; /* 최소 높이 보장 */
             display: flex;
             align-items: center;
             justify-content: center;
-            box-shadow: inset 0 0 20px rgba(0,0,0,0.8);
-            margin-bottom: 10px;
+            box-shadow: inset 0 0 15px rgba(0,0,0,0.8);
+            margin-bottom: 8px;
             position: relative;
             overflow: hidden;
         }
@@ -94,8 +102,8 @@
             position: absolute;
             top: 0; left: 0; width: 100%; height: 100%;
             z-index: 20;
-            pointer-events: auto; /* 입력 필드 클릭 가능하게 */
-            overflow: hidden; /* 내부 내용이 넘치지 않도록 */
+            pointer-events: auto;
+            overflow: hidden;
         }
 
         .screen-ui {
@@ -104,165 +112,130 @@
             display: none; 
             flex-direction: column;
             align-items: center;
-            justify-content: center; /* 중앙 정렬 */
+            justify-content: center;
             background: rgba(0, 0, 0, 0.85);
             text-align: center;
-            padding: 10px; /* 내부 패딩 추가로 텍스트 잘림 방지 */
+            padding: 10px;
         }
 
-        .screen-ui.active {
-            display: flex;
-        }
+        .screen-ui.active { display: flex; }
 
         h1 {
-            font-size: 18px; /* 폰트 사이즈 약간 축소 */
-            margin-bottom: 15px; /* 여백 축소 */
-            color: #0ff;
-            text-shadow: 3px 3px #f0f;
-            line-height: 1.4;
-        }
-
-        h2 {
-            font-size: 10px; /* 폰트 사이즈 축소 */
-            color: #ff0;
+            font-size: 16px; /* 폰트 사이즈 더 축소 */
             margin-bottom: 10px;
-        }
-
-        p {
-            font-size: 10px;
-            color: #fff;
-            margin-bottom: 8px; /* 여백 축소 */
+            color: #0ff;
+            text-shadow: 2px 2px #f0f;
             line-height: 1.4;
         }
 
-        /* 통계 박스 */
+        h2 { font-size: 10px; color: #ff0; margin-bottom: 8px; }
+        p { font-size: 9px; color: #fff; margin-bottom: 6px; line-height: 1.4; }
+
         .stats-container {
             display: flex;
             justify-content: center;
-            gap: 10px;
-            margin-bottom: 15px;
+            gap: 8px;
+            margin-bottom: 12px;
             width: 100%;
         }
 
         .stat-item {
             background-color: rgba(0, 20, 0, 0.6);
             border: 1px solid #0f0;
-            padding: 8px; /* 패딩 축소 */
-            width: 90px;
+            padding: 6px;
+            width: 85px;
         }
 
-        .stat-label { display: block; color: #888; font-size: 7px; margin-bottom: 3px; }
-        .stat-value { font-size: 10px; color: #fff; }
+        .stat-label { display: block; color: #888; font-size: 6px; margin-bottom: 3px; }
+        .stat-value { font-size: 9px; color: #fff; }
 
-        /* 버튼 스타일 */
         button {
             background: transparent;
             color: #0f0;
             font-family: 'Press Start 2P', cursive;
-            font-size: 10px; /* 버튼 폰트 축소 */
-            padding: 8px 12px; /* 버튼 크기 축소 */
+            font-size: 9px;
+            padding: 8px 10px;
             border: 2px solid #0f0;
             cursor: pointer;
-            margin-top: 8px;
+            margin-top: 6px;
             text-transform: uppercase;
         }
         
         button:hover { background: #0f0; color: #000; }
         button.blink { animation: blink 1s infinite; }
-
         @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
 
-        /* 랭킹 리스트 스타일 */
         .ranking-list-container {
-            width: 90%;
-            margin-bottom: 15px;
-            font-size: 8px; /* 폰트 사이즈 축소 */
+            width: 95%;
+            margin-bottom: 10px;
+            font-size: 8px;
             line-height: 1.6;
         }
         .rank-row {
             display: flex;
             justify-content: space-between;
             border-bottom: 1px dashed #333;
-            padding: 4px 0; /* 패딩 축소 */
+            padding: 3px 0;
             align-items: center; 
         }
-        /* 순위 아이콘 영역 (고정 너비) */
-        .rank-rank { 
-            color: #ff0; 
-            width: 50px; /* 너비 조정 */
-            text-align: left;
-            font-size: 12px; /* 이모지 크기 조정 */
-            text-shadow: 1px 1px #000; 
-        }
-        /* 이름 영역 */
-        .rank-name { 
-            color: #0ff; 
-            text-align: center; 
-            flex: 1; 
-            font-size: 10px; 
-        } 
-        /* 점수 영역 */
-        .rank-score { 
-            color: #fff; 
-            text-align: right; 
-            font-size: 10px; 
-            width: 60px; 
-        }
+        .rank-rank { color: #ff0; width: 45px; text-align: left; font-size: 11px; text-shadow: 1px 1px #000; }
+        .rank-name { color: #0ff; text-align: center; flex: 1; font-size: 9px; } 
+        .rank-score { color: #fff; text-align: right; font-size: 9px; width: 55px; }
 
-        /* 이니셜 입력 필드 */
         input#initials-input {
-            background: transparent;
-            border: none;
-            border-bottom: 3px solid #0f0;
-            color: #ff0;
-            font-family: 'Press Start 2P', cursive;
-            font-size: 20px; /* 입력창 크기 조정 */
-            width: 100px;
-            text-align: center;
-            margin: 15px 0;
-            text-transform: uppercase;
-            outline: none;
+            background: transparent; border: none; border-bottom: 2px solid #0f0; color: #ff0;
+            font-family: 'Press Start 2P', cursive; font-size: 18px; width: 90px;
+            text-align: center; margin: 12px 0; text-transform: uppercase; outline: none;
         }
 
-        /* --- 컨트롤러 영역 --- */
+        /* --- 컨트롤러 영역 (고정 크기) --- */
         .controls-area {
-            flex: 0 0 auto; 
+            flex: 0 0 auto; /* 높이 고정 (내용물 크기만큼) */
             display: grid;
             grid-template-columns: 1fr 1fr;
             grid-template-rows: auto auto; 
-            gap: 5px; 
-            padding: 0 5px 5px 5px;
+            gap: 2px; 
+            padding: 0 2px 2px 2px;
+            /* 높이 제한이 있는 경우 컨트롤러 크기 조절 */
+            max-height: 40vh; 
         }
 
         /* 십자키 */
-        .d-pad-container { position: relative; width: 110px; height: 110px; justify-self: center; align-self: center; }
+        .d-pad-container { 
+            position: relative; width: 100px; height: 100px; /* 크기 축소 */
+            justify-self: center; align-self: center; 
+        }
         .d-pad { position: relative; width: 100%; height: 100%; }
         .d-pad div { position: absolute; background: #333; border-radius: 4px; box-shadow: inset 1px 1px 2px rgba(255,255,255,0.2), 2px 2px 5px rgba(0,0,0,0.3); cursor: pointer; }
         .d-pad div:active { background: #222; transform: scale(0.95); }
-        .d-pad-h { top: 36px; left: 0; width: 110px; height: 38px; z-index: 1; }
-        .d-pad-v { top: 0; left: 36px; width: 38px; height: 110px; z-index: 1; }
-        .d-pad-center { top: 36px; left: 36px; width: 38px; height: 38px; background: radial-gradient(circle at 30% 30%, #444, #222); z-index: 2; border-radius: 50%; }
+        .d-pad-h { top: 33px; left: 0; width: 100px; height: 34px; z-index: 1; }
+        .d-pad-v { top: 0; left: 33px; width: 34px; height: 100px; z-index: 1; }
+        .d-pad-center { top: 33px; left: 33px; width: 34px; height: 34px; background: radial-gradient(circle at 30% 30%, #444, #222); z-index: 2; border-radius: 50%; }
+        /* 터치 영역 */
         .d-btn { position: absolute; z-index: 10; opacity: 0; cursor: pointer; }
-        .btn-up { top: 0; left: 36px; width: 38px; height: 38px; }
-        .btn-down { bottom: 0; left: 36px; width: 38px; height: 38px; }
-        .btn-left { top: 36px; left: 0; width: 38px; height: 38px; }
-        .btn-right { top: 36px; right: 0; width: 38px; height: 38px; }
+        .btn-up { top: 0; left: 33px; width: 34px; height: 34px; }
+        .btn-down { bottom: 0; left: 33px; width: 34px; height: 34px; }
+        .btn-left { top: 33px; left: 0; width: 34px; height: 34px; }
+        .btn-right { top: 33px; right: 0; width: 34px; height: 34px; }
 
         /* 액션 버튼 */
-        .action-buttons { position: relative; width: 120px; height: 120px; justify-self: center; align-self: center; transform: rotate(-15deg); }
-        .abxy-btn { position: absolute; width: 32px; height: 32px; border-radius: 50%; background: #333; color: rgba(255,255,255,0.8); display: flex; align-items: center; justify-content: center; font-family: 'Roboto', sans-serif; font-weight: bold; font-size: 13px; box-shadow: 0 3px 0 #111, 0 5px 5px rgba(0,0,0,0.3); cursor: pointer; transition: transform 0.1s, box-shadow 0.1s; }
+        .action-buttons { 
+            position: relative; width: 110px; height: 110px; /* 크기 축소 */
+            justify-self: center; align-self: center; transform: rotate(-15deg); 
+        }
+        .abxy-btn { position: absolute; width: 30px; height: 30px; border-radius: 50%; background: #333; color: rgba(255,255,255,0.8); display: flex; align-items: center; justify-content: center; font-family: 'Roboto', sans-serif; font-weight: bold; font-size: 12px; box-shadow: 0 3px 0 #111, 0 5px 5px rgba(0,0,0,0.3); cursor: pointer; transition: transform 0.1s, box-shadow 0.1s; }
         .abxy-btn:active { transform: translateY(3px); box-shadow: 0 0 0 #111, inset 0 2px 5px rgba(0,0,0,0.5); }
-        .btn-x { top: 5px; left: 44px; color: #40a0ff; }
-        .btn-y { top: 44px; left: 5px; color: #40ff40; }
-        .btn-b { top: 44px; right: 5px; color: #ffd040; }
-        .btn-a { bottom: 5px; left: 44px; color: #ff4040; }
+        .btn-x { top: 4px; left: 40px; color: #40a0ff; }
+        .btn-y { top: 40px; left: 4px; color: #40ff40; }
+        .btn-b { top: 40px; right: 4px; color: #ffd040; }
+        .btn-a { bottom: 4px; left: 40px; color: #ff4040; }
 
         /* 기능 버튼 */
-        .center-buttons { grid-column: 1 / -1; display: flex; justify-content: center; gap: 20px; margin: 5px 0; }
-        .fn-btn-group { display: flex; flex-direction: column; align-items: center; gap: 3px; }
-        .fn-btn { width: 45px; height: 12px; background: #555; border-radius: 8px; transform: rotate(-20deg); box-shadow: 0 2px 2px rgba(0,0,0,0.3); cursor: pointer; }
+        .center-buttons { grid-column: 1 / -1; display: flex; justify-content: center; gap: 15px; margin: 5px 0; }
+        .fn-btn-group { display: flex; flex-direction: column; align-items: center; gap: 2px; }
+        .fn-btn { width: 40px; height: 10px; background: #555; border-radius: 6px; transform: rotate(-20deg); box-shadow: 0 2px 2px rgba(0,0,0,0.3); cursor: pointer; }
         .fn-btn:active { transform: rotate(-20deg) scale(0.95); background: #444; }
-        .fn-label { font-family: 'Roboto', sans-serif; font-size: 7px; color: #888; font-weight: bold; text-transform: uppercase; }
+        .fn-label { font-family: 'Roboto', sans-serif; font-size: 6px; color: #888; font-weight: bold; text-transform: uppercase; }
 
         .mobile-controls { display: none; }
     </style>
@@ -295,8 +268,8 @@
                         <p>YOUR SCORE: <span id="go-score" class="highlight">0</span></p>
                         
                         <!-- 게임 오버 시 보여줄 미니 랭킹 -->
-                        <div style="margin: 10px 0; width: 85%;">
-                            <h2 style="font-size: 8px; color: #888; margin-bottom: 8px; letter-spacing: 2px;">- HALL OF FAME -</h2>
+                        <div style="margin: 8px 0; width: 90%;">
+                            <h2 style="font-size: 8px; color: #888; margin-bottom: 6px; letter-spacing: 2px;">- HALL OF FAME -</h2>
                             <div id="gameover-ranking-list" class="ranking-list-container" style="width: 100%;">
                                 <!-- 랭킹 목록 -->
                             </div>
@@ -410,8 +383,15 @@
             rankings.slice(0, 5).forEach((item, index) => {
                 const div = document.createElement('div');
                 div.className = 'rank-row';
+                
+                // 1, 2, 3등 특별 아이콘 처리 (숫자와 아이콘 함께 표시)
+                let rankDisplay = `${index + 1}.`;
+                if (index === 0) rankDisplay = '1. 🥇';
+                else if (index === 1) rankDisplay = '2. 🥈';
+                else if (index === 2) rankDisplay = '3. 🥉';
+
                 div.innerHTML = `
-                    <span class="rank-rank">${index + 1}.</span>
+                    <span class="rank-rank">${rankDisplay}</span>
                     <span class="rank-name">${item.name}</span>
                     <span class="rank-score">${item.score}</span>
                 `;

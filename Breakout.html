@@ -34,11 +34,11 @@
             background-color: #e0e0e0;
             width: 100%;
             max-width: 420px;
-            height: 98vh; /* 높이 확장 */
+            height: 98vh;
             max-height: 850px;
-            border-radius: 20px; /* 라운드 약간 축소 */
-            padding: 15px; /* 패딩 축소 */
-            padding-bottom: 10px; /* 하단 패딩 최소화 */
+            border-radius: 20px;
+            padding: 15px;
+            padding-bottom: 10px;
             display: flex;
             flex-direction: column;
             box-shadow: 
@@ -48,22 +48,21 @@
             position: relative;
         }
 
-        /* --- 화면 영역 (비율 확대) --- */
+        /* --- 화면 영역 --- */
         .screen-bezel {
             background-color: #111;
             border-radius: 10px;
             padding: 10px;
-            flex: 1; /* 남은 공간 모두 차지 (컨트롤러 고정 후 나머지) */
+            flex: 1;
             display: flex;
             align-items: center;
             justify-content: center;
             box-shadow: inset 0 0 20px rgba(0,0,0,0.8);
-            margin-bottom: 10px; /* 간격 축소 */
+            margin-bottom: 10px;
             position: relative;
             overflow: hidden;
         }
 
-        /* 실제 게임이 그려지는 컨테이너 */
         #game-container {
             position: relative;
             width: 100%;
@@ -81,7 +80,6 @@
             background-color: #000;
         }
 
-        /* 스캔라인 */
         .scanlines {
             position: absolute;
             top: 0; left: 0; width: 100%; height: 100%;
@@ -91,285 +89,259 @@
             z-index: 10;
         }
 
-        /* UI 레이어 */
+        /* --- UI 레이어 시스템 --- */
         #ui-layer {
             position: absolute;
             top: 0; left: 0; width: 100%; height: 100%;
-            display: flex;
+            z-index: 20;
+            pointer-events: auto; /* 입력 필드 클릭 가능하게 */
+            overflow: hidden; /* 내부 내용이 넘치지 않도록 */
+        }
+
+        .screen-ui {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            display: none; 
             flex-direction: column;
             align-items: center;
-            justify-content: center;
+            justify-content: center; /* 중앙 정렬 */
             background: rgba(0, 0, 0, 0.85);
-            z-index: 20;
             text-align: center;
+            padding: 10px; /* 내부 패딩 추가로 텍스트 잘림 방지 */
+        }
+
+        .screen-ui.active {
+            display: flex;
         }
 
         h1 {
-            font-size: 20px;
-            margin-bottom: 20px;
+            font-size: 18px; /* 폰트 사이즈 약간 축소 */
+            margin-bottom: 15px; /* 여백 축소 */
             color: #0ff;
             text-shadow: 3px 3px #f0f;
             line-height: 1.4;
         }
 
+        h2 {
+            font-size: 10px; /* 폰트 사이즈 축소 */
+            color: #ff0;
+            margin-bottom: 10px;
+        }
+
+        p {
+            font-size: 10px;
+            color: #fff;
+            margin-bottom: 8px; /* 여백 축소 */
+            line-height: 1.4;
+        }
+
+        /* 통계 박스 */
         .stats-container {
             display: flex;
-            flex-wrap: wrap;
             justify-content: center;
             gap: 10px;
+            margin-bottom: 15px;
             width: 100%;
-            padding: 0 10px;
-            margin-bottom: 20px;
         }
 
         .stat-item {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
             background-color: rgba(0, 20, 0, 0.6);
-            border: 1px solid #333;
-            padding: 10px 5px;
-            width: 45%;
-            color: #fff;
+            border: 1px solid #0f0;
+            padding: 8px; /* 패딩 축소 */
+            width: 90px;
         }
 
-        .stat-label { color: #888; font-size: 8px; margin-bottom: 5px; letter-spacing: 1px; }
-        .stat-value { font-size: 12px; }
-        .highlight { color: #ff0; }
-        .max-stat { color: #0ff; }
+        .stat-label { display: block; color: #888; font-size: 7px; margin-bottom: 3px; }
+        .stat-value { font-size: 10px; color: #fff; }
 
-        button#start-btn {
+        /* 버튼 스타일 */
+        button {
             background: transparent;
             color: #0f0;
             font-family: 'Press Start 2P', cursive;
-            font-size: 12px;
-            padding: 10px 15px;
+            font-size: 10px; /* 버튼 폰트 축소 */
+            padding: 8px 12px; /* 버튼 크기 축소 */
             border: 2px solid #0f0;
             cursor: pointer;
-            animation: blink 1s infinite;
+            margin-top: 8px;
+            text-transform: uppercase;
         }
+        
+        button:hover { background: #0f0; color: #000; }
+        button.blink { animation: blink 1s infinite; }
 
         @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
 
+        /* 랭킹 리스트 스타일 */
+        .ranking-list-container {
+            width: 90%;
+            margin-bottom: 15px;
+            font-size: 8px; /* 폰트 사이즈 축소 */
+            line-height: 1.6;
+        }
+        .rank-row {
+            display: flex;
+            justify-content: space-between;
+            border-bottom: 1px dashed #333;
+            padding: 4px 0; /* 패딩 축소 */
+            align-items: center; 
+        }
+        /* 순위 아이콘 영역 (고정 너비) */
+        .rank-rank { 
+            color: #ff0; 
+            width: 50px; /* 너비 조정 */
+            text-align: left;
+            font-size: 12px; /* 이모지 크기 조정 */
+            text-shadow: 1px 1px #000; 
+        }
+        /* 이름 영역 */
+        .rank-name { 
+            color: #0ff; 
+            text-align: center; 
+            flex: 1; 
+            font-size: 10px; 
+        } 
+        /* 점수 영역 */
+        .rank-score { 
+            color: #fff; 
+            text-align: right; 
+            font-size: 10px; 
+            width: 60px; 
+        }
+
+        /* 이니셜 입력 필드 */
+        input#initials-input {
+            background: transparent;
+            border: none;
+            border-bottom: 3px solid #0f0;
+            color: #ff0;
+            font-family: 'Press Start 2P', cursive;
+            font-size: 20px; /* 입력창 크기 조정 */
+            width: 100px;
+            text-align: center;
+            margin: 15px 0;
+            text-transform: uppercase;
+            outline: none;
+        }
+
         /* --- 컨트롤러 영역 --- */
         .controls-area {
-            /* flex: 1 제거하고 내용물 크기에 맞춤 */
             flex: 0 0 auto; 
             display: grid;
             grid-template-columns: 1fr 1fr;
-            grid-template-rows: auto auto; /* 하단 장식 제거로 2행으로 충분 */
-            gap: 5px; /* 간격 축소 */
-            padding: 0 5px;
-            padding-bottom: 5px;
+            grid-template-rows: auto auto; 
+            gap: 5px; 
+            padding: 0 5px 5px 5px;
         }
 
-        /* 십자키 (D-Pad) */
-        .d-pad-container {
-            position: relative;
-            width: 110px; /* 약간 축소 */
-            height: 110px;
-            justify-self: center;
-            align-self: center;
-        }
-
-        .d-pad {
-            position: relative;
-            width: 100%;
-            height: 100%;
-        }
-
-        .d-pad div {
-            position: absolute;
-            background: #333;
-            border-radius: 4px;
-            box-shadow: 
-                inset 1px 1px 2px rgba(255,255,255,0.2),
-                2px 2px 5px rgba(0,0,0,0.3);
-            cursor: pointer;
-        }
-        
-        .d-pad div:active {
-            background: #222;
-            transform: scale(0.95);
-        }
-
-        .d-pad-h {
-            top: 36px; left: 0; width: 110px; height: 38px;
-            z-index: 1;
-        }
-        
-        .d-pad-v {
-            top: 0; left: 36px; width: 38px; height: 110px;
-            z-index: 1;
-        }
-        
-        .d-pad-center {
-            top: 36px; left: 36px; width: 38px; height: 38px;
-            background: radial-gradient(circle at 30% 30%, #444, #222);
-            z-index: 2;
-            border-radius: 50%;
-        }
-        
-        /* 터치 영역 확장 */
-        .d-btn {
-            position: absolute;
-            z-index: 10;
-            opacity: 0; 
-            cursor: pointer;
-        }
+        /* 십자키 */
+        .d-pad-container { position: relative; width: 110px; height: 110px; justify-self: center; align-self: center; }
+        .d-pad { position: relative; width: 100%; height: 100%; }
+        .d-pad div { position: absolute; background: #333; border-radius: 4px; box-shadow: inset 1px 1px 2px rgba(255,255,255,0.2), 2px 2px 5px rgba(0,0,0,0.3); cursor: pointer; }
+        .d-pad div:active { background: #222; transform: scale(0.95); }
+        .d-pad-h { top: 36px; left: 0; width: 110px; height: 38px; z-index: 1; }
+        .d-pad-v { top: 0; left: 36px; width: 38px; height: 110px; z-index: 1; }
+        .d-pad-center { top: 36px; left: 36px; width: 38px; height: 38px; background: radial-gradient(circle at 30% 30%, #444, #222); z-index: 2; border-radius: 50%; }
+        .d-btn { position: absolute; z-index: 10; opacity: 0; cursor: pointer; }
         .btn-up { top: 0; left: 36px; width: 38px; height: 38px; }
         .btn-down { bottom: 0; left: 36px; width: 38px; height: 38px; }
         .btn-left { top: 36px; left: 0; width: 38px; height: 38px; }
         .btn-right { top: 36px; right: 0; width: 38px; height: 38px; }
 
-        /* 액션 버튼 (ABXY) */
-        .action-buttons {
-            position: relative;
-            width: 120px; /* 약간 축소 */
-            height: 120px;
-            justify-self: center;
-            align-self: center;
-            transform: rotate(-15deg);
-        }
-
-        .abxy-btn {
-            position: absolute;
-            width: 32px; /* 약간 축소 */
-            height: 32px;
-            border-radius: 50%;
-            background: #333;
-            color: rgba(255,255,255,0.8);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-family: 'Roboto', sans-serif;
-            font-weight: bold;
-            font-size: 13px;
-            box-shadow: 
-                0 3px 0 #111,
-                0 5px 5px rgba(0,0,0,0.3);
-            cursor: pointer;
-            transition: transform 0.1s, box-shadow 0.1s;
-        }
-
-        .abxy-btn:active {
-            transform: translateY(3px);
-            box-shadow: 0 0 0 #111, inset 0 2px 5px rgba(0,0,0,0.5);
-        }
-
+        /* 액션 버튼 */
+        .action-buttons { position: relative; width: 120px; height: 120px; justify-self: center; align-self: center; transform: rotate(-15deg); }
+        .abxy-btn { position: absolute; width: 32px; height: 32px; border-radius: 50%; background: #333; color: rgba(255,255,255,0.8); display: flex; align-items: center; justify-content: center; font-family: 'Roboto', sans-serif; font-weight: bold; font-size: 13px; box-shadow: 0 3px 0 #111, 0 5px 5px rgba(0,0,0,0.3); cursor: pointer; transition: transform 0.1s, box-shadow 0.1s; }
+        .abxy-btn:active { transform: translateY(3px); box-shadow: 0 0 0 #111, inset 0 2px 5px rgba(0,0,0,0.5); }
         .btn-x { top: 5px; left: 44px; color: #40a0ff; }
         .btn-y { top: 44px; left: 5px; color: #40ff40; }
         .btn-b { top: 44px; right: 5px; color: #ffd040; }
         .btn-a { bottom: 5px; left: 44px; color: #ff4040; }
 
-        /* 중앙 기능 버튼 (Select/Start) */
-        .center-buttons {
-            grid-column: 1 / -1;
-            display: flex;
-            justify-content: center;
-            gap: 20px;
-            margin-top: 5px; /* 상단 여백 축소 */
-            margin-bottom: 5px; /* 하단 여백 축소 */
-        }
-
-        .fn-btn-group {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 3px;
-        }
-
-        .fn-btn {
-            width: 45px;
-            height: 12px;
-            background: #555;
-            border-radius: 8px;
-            transform: rotate(-20deg);
-            box-shadow: 0 2px 2px rgba(0,0,0,0.3);
-            cursor: pointer;
-        }
-        
-        .fn-btn:active {
-            transform: rotate(-20deg) scale(0.95);
-            background: #444;
-        }
-
-        .fn-label {
-            font-family: 'Roboto', sans-serif;
-            font-size: 7px;
-            color: #888;
-            font-weight: bold;
-            text-transform: uppercase;
-        }
-
-        /* 하단 장식 제거 */
-        .bottom-decor { display: none; }
+        /* 기능 버튼 */
+        .center-buttons { grid-column: 1 / -1; display: flex; justify-content: center; gap: 20px; margin: 5px 0; }
+        .fn-btn-group { display: flex; flex-direction: column; align-items: center; gap: 3px; }
+        .fn-btn { width: 45px; height: 12px; background: #555; border-radius: 8px; transform: rotate(-20deg); box-shadow: 0 2px 2px rgba(0,0,0,0.3); cursor: pointer; }
+        .fn-btn:active { transform: rotate(-20deg) scale(0.95); background: #444; }
+        .fn-label { font-family: 'Roboto', sans-serif; font-size: 7px; color: #888; font-weight: bold; text-transform: uppercase; }
 
         .mobile-controls { display: none; }
-
     </style>
 </head>
 <body>
 
     <div class="console-body">
-        <!-- 화면 영역 (비율 확대됨) -->
         <div class="screen-bezel">
             <div id="game-container">
                 <canvas id="gameCanvas"></canvas>
                 <div class="scanlines"></div>
                 
                 <div id="ui-layer">
-                    <h1>RETRO<br>BREAKOUT</h1>
-                    <div class="stats-container">
-                        <div class="stat-item">
-                            <span class="stat-label">LAST SCORE</span>
-                            <span id="last-score-display" class="stat-value highlight">0</span>
+                    <!-- 시작 화면 -->
+                    <div id="screen-start" class="screen-ui active">
+                        <h1>RETRO<br>BREAKOUT</h1>
+                        <div class="stats-container">
+                            <div class="stat-item">
+                                <span class="stat-label">HIGH SCORE</span>
+                                <span id="start-highscore" class="stat-value highlight">0</span>
+                            </div>
                         </div>
-                        <div class="stat-item">
-                            <span class="stat-label">HIGH SCORE</span>
-                            <span id="highscore-display" class="stat-value max-stat">0</span>
-                        </div>
+                        <button id="start-btn" class="blink">INSERT COIN</button>
+                        <button id="view-ranking-btn" style="margin-top:5px; border:none; font-size:10px; color:#888;">VIEW RANKING</button>
                     </div>
-                    <button id="start-btn">PRESS START</button>
+
+                    <!-- 게임 오버 화면 -->
+                    <div id="screen-gameover" class="screen-ui">
+                        <h1>GAME OVER</h1>
+                        <p>YOUR SCORE: <span id="go-score" class="highlight">0</span></p>
+                        
+                        <!-- 게임 오버 시 보여줄 미니 랭킹 -->
+                        <div style="margin: 10px 0; width: 85%;">
+                            <h2 style="font-size: 8px; color: #888; margin-bottom: 8px; letter-spacing: 2px;">- HALL OF FAME -</h2>
+                            <div id="gameover-ranking-list" class="ranking-list-container" style="width: 100%;">
+                                <!-- 랭킹 목록 -->
+                            </div>
+                        </div>
+
+                        <button id="retry-btn">TRY AGAIN</button>
+                        <button id="go-home-btn" style="margin-top:5px; border:none; font-size:10px; color:#888;">MAIN MENU</button>
+                    </div>
+
+                    <!-- 신기록(이니셜 입력) 화면 -->
+                    <div id="screen-newrecord" class="screen-ui">
+                        <h1 class="highlight">NEW RECORD!</h1>
+                        <p>ENTER INITIALS</p>
+                        <p>RANK: <span id="nr-rank">1</span></p>
+                        <input type="text" id="initials-input" maxlength="3" autocomplete="off" placeholder="AAA">
+                        <button id="submit-score-btn">OK</button>
+                    </div>
+
+                    <!-- 전체 랭킹 화면 -->
+                    <div id="screen-ranking" class="screen-ui">
+                        <h2>HALL OF FAME</h2>
+                        <div id="ranking-list" class="ranking-list-container">
+                            <!-- 랭킹 목록 -->
+                        </div>
+                        <button id="back-btn">BACK</button>
+                    </div>
                 </div>
             </div>
         </div>
 
-        <!-- 컨트롤러 영역 (하단으로 밀착) -->
         <div class="controls-area">
-            <!-- 십자키 -->
             <div class="d-pad-container">
                 <div class="d-pad">
-                    <div class="d-pad-h"></div>
-                    <div class="d-pad-v"></div>
-                    <div class="d-pad-center"></div>
-                    <!-- 실제 터치 영역 -->
-                    <div class="d-btn btn-up"></div> <!-- 기능 없음 -->
-                    <div class="d-btn btn-down"></div> <!-- 기능 없음 -->
-                    <div class="d-btn btn-left" id="btn-left"></div>
-                    <div class="d-btn btn-right" id="btn-right"></div>
+                    <div class="d-pad-h"></div><div class="d-pad-v"></div><div class="d-pad-center"></div>
+                    <div class="d-btn btn-up"></div><div class="d-btn btn-down"></div>
+                    <div class="d-btn btn-left" id="btn-left"></div><div class="d-btn btn-right" id="btn-right"></div>
                 </div>
             </div>
-
-            <!-- 액션 버튼 -->
             <div class="action-buttons">
-                <div class="abxy-btn btn-x">X</div>
-                <div class="abxy-btn btn-y">Y</div>
-                <div class="abxy-btn btn-b" id="btn-b">B</div>
-                <div class="abxy-btn btn-a" id="btn-a">A</div>
+                <div class="abxy-btn btn-x">X</div><div class="abxy-btn btn-y">Y</div>
+                <div class="abxy-btn btn-b" id="btn-b">B</div><div class="abxy-btn btn-a" id="btn-a">A</div>
             </div>
-
-            <!-- 기능 버튼 -->
             <div class="center-buttons">
-                <div class="fn-btn-group">
-                    <div class="fn-btn" id="btn-select"></div>
-                    <span class="fn-label">Select</span>
-                </div>
-                <div class="fn-btn-group">
-                    <div class="fn-btn" id="btn-start"></div>
-                    <span class="fn-label">Start</span>
-                </div>
+                <div class="fn-btn-group"><div class="fn-btn" id="btn-select"></div><span class="fn-label">Select</span></div>
+                <div class="fn-btn-group"><div class="fn-btn" id="btn-start"></div><span class="fn-label">Start</span></div>
             </div>
         </div>
     </div>
@@ -380,54 +352,87 @@
          */
         const canvas = document.getElementById('gameCanvas');
         const ctx = canvas.getContext('2d');
-        const uiLayer = document.getElementById('ui-layer');
-        const startBtn = document.getElementById('start-btn');
         const gameContainer = document.getElementById('game-container');
         
-        // UI 요소
-        const lastScoreDisplay = document.getElementById('last-score-display');
-        const highScoreDisplay = document.getElementById('highscore-display');
+        // Screens
+        const screenStart = document.getElementById('screen-start');
+        const screenGameOver = document.getElementById('screen-gameover');
+        const screenNewRecord = document.getElementById('screen-newrecord');
+        const screenRanking = document.getElementById('screen-ranking');
+        const allScreens = [screenStart, screenGameOver, screenNewRecord, screenRanking];
+
+        // UI Elements
+        const startHighScoreDisplay = document.getElementById('start-highscore');
+        const goScoreDisplay = document.getElementById('go-score');
+        const nrRankDisplay = document.getElementById('nr-rank');
+        const initialsInput = document.getElementById('initials-input');
         
+        // 랭킹 리스트 컨테이너들
+        const rankingList = document.getElementById('ranking-list');
+        const gameoverRankingList = document.getElementById('gameover-ranking-list');
+
+        // Buttons
+        const startBtn = document.getElementById('start-btn');
+        const viewRankingBtn = document.getElementById('view-ranking-btn');
+        const retryBtn = document.getElementById('retry-btn');
+        const goHomeBtn = document.getElementById('go-home-btn'); // Renamed/New
+        const submitScoreBtn = document.getElementById('submit-score-btn');
+        const backBtn = document.getElementById('back-btn');
+
         // 로컬 스토리지 키
         const STORAGE_KEYS = {
             HIGH_SCORE: 'retroBreakout_highScore',
-            MAX_LEVEL: 'retroBreakout_maxLevel',
-            LAST_SCORE: 'retroBreakout_lastScore',
-            LAST_LEVEL: 'retroBreakout_lastLevel'
+            RANKINGS: 'retroBreakout_rankings'
         };
 
         // 데이터 로드
         let highScore = parseInt(localStorage.getItem(STORAGE_KEYS.HIGH_SCORE)) || 0;
-        let maxLevel = parseInt(localStorage.getItem(STORAGE_KEYS.MAX_LEVEL)) || 1;
-        let lastScore = parseInt(localStorage.getItem(STORAGE_KEYS.LAST_SCORE)) || 0;
-        let lastLevel = parseInt(localStorage.getItem(STORAGE_KEYS.LAST_LEVEL)) || 1;
+        let rankings = JSON.parse(localStorage.getItem(STORAGE_KEYS.RANKINGS)) || [
+            { name: 'AAA', score: 2000 },
+            { name: 'BBB', score: 1500 },
+            { name: 'CCC', score: 1000 },
+            { name: 'DDD', score: 500 },
+            { name: 'EEE', score: 100 }
+        ];
 
-        // UI 업데이트
-        function updateStatsUI() {
-            highScoreDisplay.innerText = highScore;
-            lastScoreDisplay.innerText = lastScore;
+        startHighScoreDisplay.innerText = highScore;
+
+        // 화면 전환 함수
+        function showScreen(screen) {
+            allScreens.forEach(s => s.classList.remove('active'));
+            if(screen) screen.classList.add('active');
         }
-        updateStatsUI();
 
-        // 캔버스 크기 설정 (컨테이너에 맞춤)
+        // 랭킹 표시 함수 (대상 컨테이너 지정 가능)
+        function renderRankings(container) {
+            container.innerHTML = '';
+            rankings.sort((a, b) => b.score - a.score); // 점수 내림차순 정렬
+            rankings.slice(0, 5).forEach((item, index) => {
+                const div = document.createElement('div');
+                div.className = 'rank-row';
+                div.innerHTML = `
+                    <span class="rank-rank">${index + 1}.</span>
+                    <span class="rank-name">${item.name}</span>
+                    <span class="rank-score">${item.score}</span>
+                `;
+                container.appendChild(div);
+            });
+        }
+
+        // 캔버스 크기 설정
         let GAME_WIDTH = 600;
-        let GAME_HEIGHT = 800; // 내부 로직용 해상도
+        let GAME_HEIGHT = 800;
         let scaleX = 1;
         let scaleY = 1;
 
         function resizeCanvas() {
             const containerWidth = gameContainer.clientWidth;
             const containerHeight = gameContainer.clientHeight;
-            
             canvas.width = containerWidth;
             canvas.height = containerHeight;
-            
-            // 비율 계산 (화면에 꽉 차게 그리기 위해)
             scaleX = canvas.width / GAME_WIDTH;
             scaleY = canvas.height / GAME_HEIGHT;
         }
-
-        // 초기 실행 및 리사이즈 이벤트
         window.addEventListener('load', resizeCanvas);
         window.addEventListener('resize', resizeCanvas);
 
@@ -565,9 +570,8 @@
             update() {
                 if (!this.active) { this.x = paddle.x + paddle.width / 2; this.y = paddle.y - this.radius - 1; return; }
                 
-                // [버그 수정] 수직 루프 방지: 수평 속도(dx)가 너무 작으면 강제로 키움
+                // 수평 속도 강제
                 if (Math.abs(this.dx) < 2) {
-                    // 0이면 랜덤 방향, 아니면 기존 방향 유지하면서 속도 증가
                     let direction = this.dx === 0 ? (Math.random() < 0.5 ? 1 : -1) : (this.dx > 0 ? 1 : -1);
                     this.dx = direction * 2; 
                 }
@@ -666,15 +670,14 @@
         }
 
         /* --- 컨트롤러 이벤트 매핑 --- */
-        // 키보드
         document.addEventListener('keydown', keyDownHandler);
         document.addEventListener('keyup', keyUpHandler);
 
         function keyDownHandler(e) {
             if(e.key === 'Right' || e.key === 'ArrowRight') rightPressed = true;
             else if(e.key === 'Left' || e.key === 'ArrowLeft') leftPressed = true;
-            else if((e.code === 'Space' || e.key === 'Enter') && gameRunning && !ballStarted) {
-                balls.forEach(b => b.active = true); ballStarted = true;
+            else if((e.code === 'Space' || e.key === 'Enter')) {
+                handleActionBtn();
             }
         }
         function keyUpHandler(e) {
@@ -682,14 +685,13 @@
             else if(e.key === 'Left' || e.key === 'ArrowLeft') leftPressed = false;
         }
 
-        // 가상 버튼 (마우스/터치)
+        // 가상 버튼
         const btnLeft = document.getElementById('btn-left');
         const btnRight = document.getElementById('btn-right');
         const btnA = document.getElementById('btn-a');
         const btnB = document.getElementById('btn-b');
         const btnStart = document.getElementById('btn-start');
 
-        // 버튼 이벤트 바인딩 헬퍼
         function bindBtn(btn, actionDown, actionUp) {
             btn.addEventListener('mousedown', (e) => { e.preventDefault(); actionDown(); });
             btn.addEventListener('mouseup', (e) => { e.preventDefault(); actionUp(); });
@@ -700,19 +702,42 @@
         bindBtn(btnLeft, () => leftPressed = true, () => leftPressed = false);
         bindBtn(btnRight, () => rightPressed = true, () => rightPressed = false);
         
-        // 시작/발사 버튼 공통 동작
-        const actionBtnHandler = () => {
-            if (gameRunning && !ballStarted) {
+        function handleActionBtn() {
+            if (screenStart.classList.contains('active')) {
+                startGame();
+            } else if (gameRunning && !ballStarted) {
                 balls.forEach(b => b.active = true); ballStarted = true;
-            } else if (!gameRunning && uiLayer.style.display !== 'none') {
-                 startGame();
+            } else if (screenGameOver.classList.contains('active')) {
+                // 게임 오버 상태에선 버튼 누르면 재시작 (TRY AGAIN 버튼과 동일)
+                startGame();
+            } else if (screenRanking.classList.contains('active')) {
+                showScreen(screenStart);
             }
-        };
+        }
 
-        bindBtn(btnA, actionBtnHandler, () => {});
-        bindBtn(btnB, actionBtnHandler, () => {});
-        bindBtn(btnStart, actionBtnHandler, () => {});
+        bindBtn(btnA, handleActionBtn, () => {});
+        bindBtn(btnB, handleActionBtn, () => {});
+        bindBtn(btnStart, handleActionBtn, () => {});
+
+        // 화면 UI 버튼 바인딩
         startBtn.addEventListener('click', startGame);
+        viewRankingBtn.addEventListener('click', () => { renderRankings(rankingList); showScreen(screenRanking); });
+        retryBtn.addEventListener('click', startGame);
+        goHomeBtn.addEventListener('click', () => { showScreen(screenStart); });
+        backBtn.addEventListener('click', () => { showScreen(screenStart); });
+        
+        // 랭킹 등록
+        submitScoreBtn.addEventListener('click', () => {
+            const initials = initialsInput.value.trim().toUpperCase() || 'AAA';
+            rankings.push({ name: initials, score: score });
+            rankings.sort((a, b) => b.score - a.score);
+            rankings = rankings.slice(0, 5); // Top 5만 유지
+            localStorage.setItem(STORAGE_KEYS.RANKINGS, JSON.stringify(rankings));
+            
+            // 등록 후 랭킹 화면으로 이동 (여기서도 랭킹 렌더링)
+            renderRankings(rankingList);
+            showScreen(screenRanking);
+        });
 
 
         function spawnItem(x, y) { if (Math.random() < 0.25) items.push(new Item(x, y)); }
@@ -725,7 +750,7 @@
 
         function nextLevel() {
             level++; playSound('levelup');
-            if(level > maxLevel) { maxLevel = level; localStorage.setItem(STORAGE_KEYS.MAX_LEVEL, maxLevel); }
+            if(level > maxLevel) { maxLevel = level; } // 로컬스토리지는 게임오버시 저장
             brickColors = getLevelColors(level);
             balls = [new Ball()]; ballStarted = false; bullets = []; items = []; particles = []; barrierActive = false; paddle = new Paddle();
             initBricks(); levelUpMsgTimer = 120; 
@@ -839,7 +864,7 @@
         }
 
         function startGame() {
-            initAudio(); uiLayer.style.display = 'none';
+            initAudio(); showScreen(null); // 모든 UI 숨김
             score = 0; level = 1; brickColors = getLevelColors(level);
             paddle = new Paddle(); balls = [new Ball()]; bullets = []; items = []; barrierActive = false;
             initBricks(); particles = []; ballStarted = false;
@@ -848,12 +873,33 @@
 
         function gameOver() {
             gameRunning = false; cancelAnimationFrame(animationId); playSound('over');
-            lastScore = score; lastLevel = level;
-            if (score > highScore) highScore = score; if (level > maxLevel) maxLevel = level;
-            localStorage.setItem(STORAGE_KEYS.HIGH_SCORE, highScore); localStorage.setItem(STORAGE_KEYS.MAX_LEVEL, maxLevel);
-            localStorage.setItem(STORAGE_KEYS.LAST_SCORE, lastScore); localStorage.setItem(STORAGE_KEYS.LAST_LEVEL, lastLevel);
             
-            startBtn.innerText = "TRY AGAIN"; updateStatsUI(); uiLayer.style.display = 'flex';
+            // 하이 스코어 갱신
+            if (score > highScore) { highScore = score; localStorage.setItem(STORAGE_KEYS.HIGH_SCORE, highScore); }
+            startHighScoreDisplay.innerText = highScore;
+
+            // 랭킹 진입 여부 확인 (5위 점수보다 높으면)
+            let lowestScore = rankings.length < 5 ? 0 : rankings[rankings.length - 1].score;
+            
+            if (score > lowestScore) {
+                // 신기록 화면 표시
+                nrRankDisplay.innerText = getPotentialRank(score);
+                initialsInput.value = '';
+                showScreen(screenNewRecord);
+                initialsInput.focus();
+            } else {
+                // 일반 게임오버 화면 표시 (여기에 랭킹 추가됨)
+                goScoreDisplay.innerText = score;
+                // 게임 오버 화면 랭킹 렌더링
+                renderRankings(gameoverRankingList);
+                showScreen(screenGameOver);
+            }
+        }
+
+        function getPotentialRank(score) {
+            let tempRankings = [...rankings, { score: score }];
+            tempRankings.sort((a, b) => b.score - a.score);
+            return tempRankings.findIndex(r => r.score === score) + 1;
         }
     </script>
 </body>

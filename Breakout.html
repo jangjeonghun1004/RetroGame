@@ -3,18 +3,22 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Retro Brick Breaker</title>
-    <!-- 구글 폰트: 레트로 픽셀 폰트 -->
+    <title>Retro Brick Breaker Console</title>
+    <!-- 구글 폰트 -->
     <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@500;700&display=swap" rel="stylesheet">
     <style>
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
+            user-select: none;
+            -webkit-user-select: none;
+            -webkit-tap-highlight-color: transparent;
         }
 
         body {
-            background-color: #050505;
+            background-color: #222; /* 배경은 어둡게 */
             color: #0f0;
             font-family: 'Press Start 2P', cursive;
             display: flex;
@@ -23,51 +27,73 @@
             justify-content: center;
             height: 100vh;
             overflow: hidden;
-            user-select: none;
-            -webkit-user-select: none;
         }
 
-        /* 게임 컨테이너 (캔버스 감싸기) */
+        /* --- 콘솔 본체 디자인 --- */
+        .console-body {
+            background-color: #e0e0e0; /* 기기 본체 색상 (흰색/회색) */
+            width: 100%;
+            max-width: 420px;
+            height: 95vh;
+            max-height: 800px;
+            border-radius: 30px;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 
+                0 0 0 5px #d0d0d0,
+                0 20px 50px rgba(0,0,0,0.5),
+                inset 0 -5px 10px rgba(0,0,0,0.1);
+            position: relative;
+        }
+
+        /* --- 화면 영역 --- */
+        .screen-bezel {
+            background-color: #111;
+            border-radius: 15px 15px 5px 5px;
+            padding: 15px;
+            flex: 1.2; /* 화면이 차지하는 비율 */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: inset 0 0 20px rgba(0,0,0,0.8);
+            margin-bottom: 20px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* 실제 게임이 그려지는 컨테이너 */
         #game-container {
             position: relative;
-            box-shadow: 0 0 20px rgba(0, 255, 0, 0.2);
-            border: 4px solid #333;
+            width: 100%;
+            height: 100%;
             background-color: #000;
-            max-width: 100%;
-            max-height: 100%;
+            border: 2px solid #333;
+            overflow: hidden;
+            border-radius: 4px;
         }
 
         canvas {
             display: block;
+            width: 100%;
+            height: 100%;
             background-color: #000;
         }
 
-        /* CRT 모니터 스캔라인 효과 */
+        /* 스캔라인 */
         .scanlines {
             position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(
-                to bottom,
-                rgba(255,255,255,0),
-                rgba(255,255,255,0) 50%,
-                rgba(0,0,0,0.2) 50%,
-                rgba(0,0,0,0.2)
-            );
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(to bottom, rgba(255,255,255,0), rgba(255,255,255,0) 50%, rgba(0,0,0,0.1) 50%, rgba(0,0,0,0.1));
             background-size: 100% 4px;
             pointer-events: none;
             z-index: 10;
         }
 
-        /* UI 오버레이 (시작 화면, 게임 오버 등) */
+        /* UI 레이어 */
         #ui-layer {
             position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
+            top: 0; left: 0; width: 100%; height: 100%;
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -78,134 +104,293 @@
         }
 
         h1 {
-            font-size: 24px;
-            margin-bottom: 30px;
+            font-size: 20px;
+            margin-bottom: 20px;
             color: #0ff;
-            text-shadow: 4px 4px #f0f;
-            line-height: 1.5;
+            text-shadow: 3px 3px #f0f;
+            line-height: 1.4;
         }
 
-        /* 통계 정보 스타일 개선 */
         .stats-container {
             display: flex;
             flex-wrap: wrap;
             justify-content: center;
-            gap: 15px;
+            gap: 10px;
             width: 100%;
-            max-width: 500px;
-            padding: 0 20px; /* 좌우 여백 확보 */
+            padding: 0 10px;
             margin-bottom: 20px;
         }
 
         .stat-item {
             display: flex;
-            flex-direction: column; /* 수직 정렬 */
-            align-items: center;    /* 중앙 정렬 */
+            flex-direction: column;
+            align-items: center;
             justify-content: center;
-            
-            background-color: rgba(0, 20, 0, 0.6); /* 반투명 배경 */
-            border: 2px solid #333; /* 테두리 */
-            padding: 15px 10px;
-            
-            width: 45%; /* 한 줄에 2개씩 배치 */
-            min-width: 130px;
-            
+            background-color: rgba(0, 20, 0, 0.6);
+            border: 1px solid #333;
+            padding: 10px 5px;
+            width: 45%;
             color: #fff;
-            box-shadow: 0 0 10px rgba(0, 255, 0, 0.1);
         }
 
-        .stat-label {
-            color: #888;
-            font-size: 10px;
-            margin-bottom: 8px;
-            text-align: center;
-            letter-spacing: 1px;
-        }
-        
-        .stat-value {
-            font-size: 16px;
-        }
+        .stat-label { color: #888; font-size: 8px; margin-bottom: 5px; letter-spacing: 1px; }
+        .stat-value { font-size: 12px; }
+        .highlight { color: #ff0; }
+        .max-stat { color: #0ff; }
 
-        .highlight {
-            color: #ff0;
-        }
-        
-        .max-stat {
-            color: #0ff; /* 최고 기록은 다른 색상 */
-        }
-
-        button {
-            margin-top: 30px;
+        button#start-btn {
             background: transparent;
             color: #0f0;
             font-family: 'Press Start 2P', cursive;
-            font-size: 16px;
-            padding: 15px 20px;
-            border: 4px solid #0f0;
+            font-size: 12px;
+            padding: 10px 15px;
+            border: 2px solid #0f0;
             cursor: pointer;
-            text-transform: uppercase;
             animation: blink 1s infinite;
         }
 
-        button:hover {
-            background: #0f0;
-            color: #000;
-            animation: none;
+        @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
+
+        /* --- 컨트롤러 영역 --- */
+        .controls-area {
+            flex: 1;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            grid-template-rows: auto auto;
+            gap: 10px;
+            padding: 0 10px;
         }
 
-        @keyframes blink {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.5; }
+        /* 십자키 (D-Pad) */
+        .d-pad-container {
+            position: relative;
+            width: 120px;
+            height: 120px;
+            justify-self: center;
+            align-self: center;
         }
 
-        /* 모바일용 컨트롤 안내 */
-        .mobile-controls {
-            display: none;
-            margin-top: 20px;
-            font-size: 10px;
+        .d-pad {
+            position: relative;
+            width: 100%;
+            height: 100%;
+        }
+
+        .d-pad div {
+            position: absolute;
+            background: #333;
+            border-radius: 4px;
+            box-shadow: 
+                inset 1px 1px 2px rgba(255,255,255,0.2),
+                2px 2px 5px rgba(0,0,0,0.3);
+            cursor: pointer;
+        }
+        
+        .d-pad div:active {
+            background: #222;
+            transform: scale(0.95);
+        }
+
+        .d-pad-h {
+            top: 40px; left: 0; width: 120px; height: 40px;
+            z-index: 1;
+        }
+        
+        .d-pad-v {
+            top: 0; left: 40px; width: 40px; height: 120px;
+            z-index: 1;
+        }
+        
+        .d-pad-center {
+            top: 40px; left: 40px; width: 40px; height: 40px;
+            background: radial-gradient(circle at 30% 30%, #444, #222);
+            z-index: 2;
+            border-radius: 50%; /* 가운데 살짝 움푹 패인 느낌 */
+        }
+        
+        /* 터치 영역 확장 (보이지 않는 버튼) */
+        .d-btn {
+            position: absolute;
+            z-index: 10;
+            opacity: 0; 
+            cursor: pointer;
+        }
+        .btn-up { top: 0; left: 40px; width: 40px; height: 40px; }
+        .btn-down { bottom: 0; left: 40px; width: 40px; height: 40px; }
+        .btn-left { top: 40px; left: 0; width: 40px; height: 40px; }
+        .btn-right { top: 40px; right: 0; width: 40px; height: 40px; }
+
+        /* 액션 버튼 (ABXY) */
+        .action-buttons {
+            position: relative;
+            width: 130px;
+            height: 130px;
+            justify-self: center;
+            align-self: center;
+            transform: rotate(-15deg); /* 인체공학적 기울기 */
+        }
+
+        .abxy-btn {
+            position: absolute;
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            background: #333;
+            color: rgba(255,255,255,0.8);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Roboto', sans-serif;
+            font-weight: bold;
+            font-size: 14px;
+            box-shadow: 
+                0 3px 0 #111,
+                0 5px 5px rgba(0,0,0,0.3);
+            cursor: pointer;
+            transition: transform 0.1s, box-shadow 0.1s;
+        }
+
+        .abxy-btn:active {
+            transform: translateY(3px);
+            box-shadow: 0 0 0 #111, inset 0 2px 5px rgba(0,0,0,0.5);
+        }
+
+        .btn-x { top: 0; left: 47px; color: #40a0ff; }
+        .btn-y { top: 47px; left: 0; color: #40ff40; }
+        .btn-b { top: 47px; right: 0; color: #ffd040; }
+        .btn-a { bottom: 0; left: 47px; color: #ff4040; }
+
+        /* 중앙 기능 버튼 (Select/Start) */
+        .center-buttons {
+            grid-column: 1 / -1;
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin-top: 10px;
+        }
+
+        .fn-btn-group {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .fn-btn {
+            width: 50px;
+            height: 15px;
+            background: #555;
+            border-radius: 10px;
+            transform: rotate(-20deg);
+            box-shadow: 0 2px 2px rgba(0,0,0,0.3);
+            cursor: pointer;
+        }
+        
+        .fn-btn:active {
+            transform: rotate(-20deg) scale(0.95);
+            background: #444;
+        }
+
+        .fn-label {
+            font-family: 'Roboto', sans-serif;
+            font-size: 8px;
             color: #888;
+            font-weight: bold;
+            text-transform: uppercase;
         }
 
-        @media (hover: none) and (pointer: coarse) {
-            .mobile-controls {
-                display: block;
-            }
+        /* 하단 장식 (스피커/조이스틱 등) */
+        .bottom-decor {
+            grid-column: 1 / -1;
+            display: flex;
+            justify-content: space-between;
+            padding: 0 20px;
+            margin-top: 10px;
+            opacity: 0.5;
         }
+        
+        .speaker-holes {
+            display: flex;
+            gap: 3px;
+        }
+        .hole { width: 4px; height: 4px; background: #999; border-radius: 50%; }
+
+        /* 모바일 안내 숨김 (이제 버튼이 있으므로) */
+        .mobile-controls { display: none; }
+
     </style>
 </head>
 <body>
 
-    <div id="game-container">
-        <canvas id="gameCanvas"></canvas>
-        <div class="scanlines"></div>
-        
-        <div id="ui-layer">
-            <h1>RETRO<br>BREAKOUT</h1>
-            
-            <div class="stats-container">
-                <!-- 현재/마지막 게임 정보 -->
-                <div class="stat-item">
-                    <span class="stat-label">LAST SCORE</span>
-                    <span id="last-score-display" class="stat-value highlight">0</span>
-                </div>
-                <div class="stat-item">
-                    <span class="stat-label">LAST LEVEL</span>
-                    <span id="last-level-display" class="stat-value highlight">1</span>
-                </div>
+    <div class="console-body">
+        <!-- 화면 영역 -->
+        <div class="screen-bezel">
+            <div id="game-container">
+                <canvas id="gameCanvas"></canvas>
+                <div class="scanlines"></div>
                 
-                <!-- 최고 기록 정보 -->
-                <div class="stat-item">
-                    <span class="stat-label">HIGH SCORE</span>
-                    <span id="highscore-display" class="stat-value max-stat">0</span>
+                <div id="ui-layer">
+                    <h1>RETRO<br>BREAKOUT</h1>
+                    <div class="stats-container">
+                        <div class="stat-item">
+                            <span class="stat-label">LAST SCORE</span>
+                            <span id="last-score-display" class="stat-value highlight">0</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-label">HIGH SCORE</span>
+                            <span id="highscore-display" class="stat-value max-stat">0</span>
+                        </div>
+                    </div>
+                    <button id="start-btn">PRESS START</button>
                 </div>
-                <div class="stat-item">
-                    <span class="stat-label">MAX LEVEL</span>
-                    <span id="maxlevel-display" class="stat-value max-stat">1</span>
+            </div>
+        </div>
+
+        <!-- 컨트롤러 영역 -->
+        <div class="controls-area">
+            <!-- 십자키 -->
+            <div class="d-pad-container">
+                <div class="d-pad">
+                    <div class="d-pad-h"></div>
+                    <div class="d-pad-v"></div>
+                    <div class="d-pad-center"></div>
+                    <!-- 실제 터치 영역 -->
+                    <div class="d-btn btn-up"></div> <!-- 기능 없음 -->
+                    <div class="d-btn btn-down"></div> <!-- 기능 없음 -->
+                    <div class="d-btn btn-left" id="btn-left"></div>
+                    <div class="d-btn btn-right" id="btn-right"></div>
                 </div>
             </div>
 
-            <div class="mobile-controls">Touch & Drag to Move</div>
-            <button id="start-btn">INSERT COIN</button>
+            <!-- 액션 버튼 -->
+            <div class="action-buttons">
+                <div class="abxy-btn btn-x">X</div>
+                <div class="abxy-btn btn-y">Y</div>
+                <div class="abxy-btn btn-b" id="btn-b">B</div>
+                <div class="abxy-btn btn-a" id="btn-a">A</div>
+            </div>
+
+            <!-- 기능 버튼 -->
+            <div class="center-buttons">
+                <div class="fn-btn-group">
+                    <div class="fn-btn" id="btn-select"></div>
+                    <span class="fn-label">Select</span>
+                </div>
+                <div class="fn-btn-group">
+                    <div class="fn-btn" id="btn-start"></div>
+                    <span class="fn-label">Start</span>
+                </div>
+            </div>
+            
+            <!-- 장식 요소 -->
+            <div class="bottom-decor">
+                 <div class="speaker-holes">
+                     <div class="hole"></div><div class="hole"></div><div class="hole"></div>
+                 </div>
+                 <div class="speaker-holes">
+                     <div class="hole"></div><div class="hole"></div><div class="hole"></div>
+                 </div>
+            </div>
         </div>
     </div>
 
@@ -217,15 +402,13 @@
         const ctx = canvas.getContext('2d');
         const uiLayer = document.getElementById('ui-layer');
         const startBtn = document.getElementById('start-btn');
+        const gameContainer = document.getElementById('game-container');
         
-        // UI 요소 (시작 화면용)
+        // UI 요소
         const lastScoreDisplay = document.getElementById('last-score-display');
-        const lastLevelDisplay = document.getElementById('last-level-display');
         const highScoreDisplay = document.getElementById('highscore-display');
-        const maxLevelDisplay = document.getElementById('maxlevel-display');
-        const titleText = uiLayer.querySelector('h1');
-
-        // 로컬 스토리지 키 정의
+        
+        // 로컬 스토리지 키
         const STORAGE_KEYS = {
             HIGH_SCORE: 'retroBreakout_highScore',
             MAX_LEVEL: 'retroBreakout_maxLevel',
@@ -239,145 +422,90 @@
         let lastScore = parseInt(localStorage.getItem(STORAGE_KEYS.LAST_SCORE)) || 0;
         let lastLevel = parseInt(localStorage.getItem(STORAGE_KEYS.LAST_LEVEL)) || 1;
 
-        // UI 업데이트 함수
+        // UI 업데이트
         function updateStatsUI() {
             highScoreDisplay.innerText = highScore;
-            maxLevelDisplay.innerText = maxLevel;
             lastScoreDisplay.innerText = lastScore;
-            lastLevelDisplay.innerText = lastLevel;
         }
-        
-        // 초기 UI 갱신
         updateStatsUI();
 
-
-        // 반응형 캔버스 크기 설정
+        // 캔버스 크기 설정 (컨테이너에 맞춤)
         let GAME_WIDTH = 600;
-        let GAME_HEIGHT = 800;
-        
+        let GAME_HEIGHT = 800; // 내부 로직용 해상도
+        let scaleX = 1;
+        let scaleY = 1;
+
         function resizeCanvas() {
-            const maxWidth = window.innerWidth - 20;
-            const maxHeight = window.innerHeight - 20;
-            const aspect = 3 / 4;
-            let width = maxWidth;
-            let height = width / aspect;
-
-            if (height > maxHeight) {
-                height = maxHeight;
-                width = height * aspect;
-            }
-
-            canvas.width = width;
-            canvas.height = height;
+            const containerWidth = gameContainer.clientWidth;
+            const containerHeight = gameContainer.clientHeight;
             
+            canvas.width = containerWidth;
+            canvas.height = containerHeight;
+            
+            // 비율 계산 (화면에 꽉 차게 그리기 위해)
             scaleX = canvas.width / GAME_WIDTH;
             scaleY = canvas.height / GAME_HEIGHT;
         }
 
-        let scaleX = 1;
-        let scaleY = 1;
-
-        resizeCanvas();
+        // 초기 실행 및 리사이즈 이벤트
+        window.addEventListener('load', resizeCanvas);
         window.addEventListener('resize', resizeCanvas);
 
         /**
-         * 오디오 시스템 (Web Audio API - 칩튠 사운드)
+         * 오디오 시스템
          */
         const AudioContext = window.AudioContext || window.webkitAudioContext;
         let audioCtx;
 
         function initAudio() {
-            if (!audioCtx) {
-                audioCtx = new AudioContext();
-            }
-            if (audioCtx.state === 'suspended') {
-                audioCtx.resume();
-            }
+            if (!audioCtx) audioCtx = new AudioContext();
+            if (audioCtx.state === 'suspended') audioCtx.resume();
         }
 
         function playSound(type) {
             if (!audioCtx) return;
-            
             const osc = audioCtx.createOscillator();
             const gain = audioCtx.createGain();
-            
             osc.connect(gain);
             gain.connect(audioCtx.destination);
-
             const now = audioCtx.currentTime;
 
             if (type === 'paddle') {
-                osc.type = 'square';
-                osc.frequency.setValueAtTime(150, now);
-                osc.frequency.exponentialRampToValueAtTime(300, now + 0.1);
-                gain.gain.setValueAtTime(0.1, now);
-                gain.gain.exponentialRampToValueAtTime(0.01, now + 0.1);
-                osc.start(now);
-                osc.stop(now + 0.1);
+                osc.type = 'square'; osc.frequency.setValueAtTime(150, now); osc.frequency.exponentialRampToValueAtTime(300, now + 0.1);
+                gain.gain.setValueAtTime(0.1, now); gain.gain.exponentialRampToValueAtTime(0.01, now + 0.1);
+                osc.start(now); osc.stop(now + 0.1);
             } else if (type === 'brick') {
-                osc.type = 'square';
-                osc.frequency.setValueAtTime(400, now);
-                osc.frequency.exponentialRampToValueAtTime(600, now + 0.1);
-                gain.gain.setValueAtTime(0.1, now);
-                gain.gain.exponentialRampToValueAtTime(0.01, now + 0.1);
-                osc.start(now);
-                osc.stop(now + 0.1);
+                osc.type = 'square'; osc.frequency.setValueAtTime(400, now); osc.frequency.exponentialRampToValueAtTime(600, now + 0.1);
+                gain.gain.setValueAtTime(0.1, now); gain.gain.exponentialRampToValueAtTime(0.01, now + 0.1);
+                osc.start(now); osc.stop(now + 0.1);
             } else if (type === 'wall') {
-                osc.type = 'triangle';
-                osc.frequency.setValueAtTime(200, now);
-                gain.gain.setValueAtTime(0.1, now);
-                gain.gain.exponentialRampToValueAtTime(0.01, now + 0.05);
-                osc.start(now);
-                osc.stop(now + 0.05);
+                osc.type = 'triangle'; osc.frequency.setValueAtTime(200, now);
+                gain.gain.setValueAtTime(0.1, now); gain.gain.exponentialRampToValueAtTime(0.01, now + 0.05);
+                osc.start(now); osc.stop(now + 0.05);
             } else if (type === 'over') {
-                osc.type = 'sawtooth';
-                osc.frequency.setValueAtTime(300, now);
-                osc.frequency.linearRampToValueAtTime(50, now + 0.5);
-                gain.gain.setValueAtTime(0.2, now);
-                gain.gain.linearRampToValueAtTime(0, now + 0.5);
-                osc.start(now);
-                osc.stop(now + 0.5);
+                osc.type = 'sawtooth'; osc.frequency.setValueAtTime(300, now); osc.frequency.linearRampToValueAtTime(50, now + 0.5);
+                gain.gain.setValueAtTime(0.2, now); gain.gain.linearRampToValueAtTime(0, now + 0.5);
+                osc.start(now); osc.stop(now + 0.5);
             } else if (type === 'goodItem') {
-                osc.type = 'sine';
-                osc.frequency.setValueAtTime(400, now);
-                osc.frequency.linearRampToValueAtTime(800, now + 0.1);
-                osc.frequency.linearRampToValueAtTime(1200, now + 0.2);
-                gain.gain.setValueAtTime(0.1, now);
-                gain.gain.linearRampToValueAtTime(0, now + 0.3);
-                osc.start(now);
-                osc.stop(now + 0.3);
+                osc.type = 'sine'; osc.frequency.setValueAtTime(400, now); osc.frequency.linearRampToValueAtTime(1200, now + 0.2);
+                gain.gain.setValueAtTime(0.1, now); gain.gain.linearRampToValueAtTime(0, now + 0.3);
+                osc.start(now); osc.stop(now + 0.3);
             } else if (type === 'badItem') {
-                osc.type = 'sawtooth';
-                osc.frequency.setValueAtTime(200, now);
-                osc.frequency.linearRampToValueAtTime(150, now + 0.2);
-                gain.gain.setValueAtTime(0.1, now);
-                gain.gain.linearRampToValueAtTime(0, now + 0.2);
-                osc.start(now);
-                osc.stop(now + 0.2);
+                osc.type = 'sawtooth'; osc.frequency.setValueAtTime(200, now); osc.frequency.linearRampToValueAtTime(150, now + 0.2);
+                gain.gain.setValueAtTime(0.1, now); gain.gain.linearRampToValueAtTime(0, now + 0.2);
+                osc.start(now); osc.stop(now + 0.2);
             } else if (type === 'laser') {
-                osc.type = 'sawtooth';
-                osc.frequency.setValueAtTime(800, now);
-                osc.frequency.exponentialRampToValueAtTime(200, now + 0.1);
-                gain.gain.setValueAtTime(0.05, now);
-                gain.gain.exponentialRampToValueAtTime(0.01, now + 0.1);
-                osc.start(now);
-                osc.stop(now + 0.1);
+                osc.type = 'sawtooth'; osc.frequency.setValueAtTime(800, now); osc.frequency.exponentialRampToValueAtTime(200, now + 0.1);
+                gain.gain.setValueAtTime(0.05, now); gain.gain.exponentialRampToValueAtTime(0.01, now + 0.1);
+                osc.start(now); osc.stop(now + 0.1);
             } else if (type === 'barrier') {
-                osc.type = 'square';
-                osc.frequency.setValueAtTime(100, now);
-                gain.gain.setValueAtTime(0.1, now);
-                gain.gain.exponentialRampToValueAtTime(0.01, now + 0.1);
-                osc.start(now);
-                osc.stop(now + 0.1);
+                osc.type = 'square'; osc.frequency.setValueAtTime(100, now);
+                gain.gain.setValueAtTime(0.1, now); gain.gain.exponentialRampToValueAtTime(0.01, now + 0.1);
+                osc.start(now); osc.stop(now + 0.1);
             } else if (type === 'levelup') { 
-                osc.type = 'square';
-                osc.frequency.setValueAtTime(300, now);
-                osc.frequency.linearRampToValueAtTime(600, now + 0.1);
-                osc.frequency.linearRampToValueAtTime(1200, now + 0.3);
-                gain.gain.setValueAtTime(0.1, now);
-                gain.gain.linearRampToValueAtTime(0, now + 0.4);
-                osc.start(now);
-                osc.stop(now + 0.4);
+                osc.type = 'square'; osc.frequency.setValueAtTime(300, now); osc.frequency.linearRampToValueAtTime(1200, now + 0.3);
+                gain.gain.setValueAtTime(0.1, now); gain.gain.linearRampToValueAtTime(0, now + 0.4);
+                osc.start(now); osc.stop(now + 0.4);
             }
         }
 
@@ -386,42 +514,24 @@
          */
         class Particle {
             constructor(x, y, color) {
-                this.x = x;
-                this.y = y;
-                this.color = color;
+                this.x = x; this.y = y; this.color = color;
                 this.size = Math.random() * 4 + 2;
-                this.speedX = Math.random() * 6 - 3;
-                this.speedY = Math.random() * 6 - 3;
+                this.speedX = Math.random() * 6 - 3; this.speedY = Math.random() * 6 - 3;
                 this.life = 1.0; 
             }
-            update() {
-                this.x += this.speedX;
-                this.y += this.speedY;
-                this.life -= 0.02;
-            }
+            update() { this.x += this.speedX; this.y += this.speedY; this.life -= 0.02; }
             draw(ctx) {
-                ctx.globalAlpha = this.life;
-                ctx.fillStyle = this.color;
+                ctx.globalAlpha = this.life; ctx.fillStyle = this.color;
                 ctx.fillRect(this.x * scaleX, this.y * scaleY, this.size * scaleX, this.size * scaleX);
                 ctx.globalAlpha = 1.0;
             }
         }
 
-        // 아이템 클래스
         class Item {
             constructor(x, y) {
-                this.x = x;
-                this.y = y;
-                this.width = 24;
-                this.height = 24;
-                this.dy = 3;
-                
-                const types = [
-                    'wide', 'narrow', 'slow', 'fast', 
-                    'multi', 'barrier', 'giant', 'tiny', 'power', 'laser'
-                ];
+                this.x = x; this.y = y; this.width = 24; this.height = 24; this.dy = 3;
+                const types = ['wide', 'narrow', 'slow', 'fast', 'multi', 'barrier', 'giant', 'tiny', 'power', 'laser'];
                 this.type = types[Math.floor(Math.random() * types.length)];
-                
                 switch(this.type) {
                     case 'wide': this.color = '#0f0'; this.symbol = 'W'; break;
                     case 'narrow': this.color = '#f00'; this.symbol = 'N'; break;
@@ -435,143 +545,66 @@
                     case 'laser': this.color = '#fff'; this.symbol = 'L'; break;
                 }
             }
-
             draw(ctx) {
-                ctx.fillStyle = this.color;
-                ctx.fillRect(this.x * scaleX, this.y * scaleY, this.width * scaleX, this.height * scaleY);
-                ctx.strokeStyle = '#fff';
-                ctx.lineWidth = 2;
-                ctx.strokeRect(this.x * scaleX, this.y * scaleY, this.width * scaleX, this.height * scaleY);
-                
-                ctx.fillStyle = '#fff';
-                ctx.font = `${12 * scaleX}px "Press Start 2P"`;
-                ctx.textAlign = 'center';
-                ctx.textBaseline = 'middle';
+                ctx.fillStyle = this.color; ctx.fillRect(this.x * scaleX, this.y * scaleY, this.width * scaleX, this.height * scaleY);
+                ctx.strokeStyle = '#fff'; ctx.lineWidth = 2; ctx.strokeRect(this.x * scaleX, this.y * scaleY, this.width * scaleX, this.height * scaleY);
+                ctx.fillStyle = '#fff'; ctx.font = `${12 * scaleX}px "Press Start 2P"`; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
                 ctx.fillText(this.symbol, (this.x + this.width/2) * scaleX, (this.y + this.height/2) * scaleY);
             }
-
-            update() {
-                this.y += this.dy;
-            }
+            update() { this.y += this.dy; }
         }
 
         class Bullet {
             constructor(x, y) {
-                this.x = x;
-                this.y = y;
-                this.width = 4;
-                this.height = 10;
-                this.dy = -10;
-                this.active = true;
+                this.x = x; this.y = y; this.width = 4; this.height = 10; this.dy = -10; this.active = true;
             }
-            
-            draw(ctx) {
-                ctx.fillStyle = '#fff';
-                ctx.fillRect(this.x * scaleX, this.y * scaleY, this.width * scaleX, this.height * scaleY);
-            }
-
-            update() {
-                this.y += this.dy;
-                if(this.y < 0) this.active = false;
-            }
+            draw(ctx) { ctx.fillStyle = '#fff'; ctx.fillRect(this.x * scaleX, this.y * scaleY, this.width * scaleX, this.height * scaleY); }
+            update() { this.y += this.dy; if(this.y < 0) this.active = false; }
         }
 
         class Ball {
             constructor(x, y, dx, dy) {
-                this.defaultRadius = 8;
-                this.radius = this.defaultRadius;
-                this.x = x || GAME_WIDTH / 2;
-                this.y = y || GAME_HEIGHT - 50;
-                
+                this.defaultRadius = 8; this.radius = this.defaultRadius;
+                this.x = x || GAME_WIDTH / 2; this.y = y || GAME_HEIGHT - 50;
                 const baseSpeed = 5 + (level - 1) * 0.5;
-                
-                this.dx = dx || baseSpeed * (Math.random() < 0.5 ? 1 : -1);
-                this.dy = dy || -baseSpeed;
-                
-                this.active = (dx !== undefined); 
-                this.powerMode = false; 
+                this.dx = dx || baseSpeed * (Math.random() < 0.5 ? 1 : -1); this.dy = dy || -baseSpeed;
+                this.active = (dx !== undefined); this.powerMode = false; 
             }
-            
             reset() {
-                this.x = paddle.x + paddle.width / 2;
-                this.y = GAME_HEIGHT - 50;
+                this.x = paddle.x + paddle.width / 2; this.y = GAME_HEIGHT - 50;
                 const baseSpeed = 5 + (level - 1) * 0.5;
-                this.dx = baseSpeed * (Math.random() < 0.5 ? 1 : -1);
-                this.dy = -baseSpeed;
-                
-                this.active = false;
-                this.radius = this.defaultRadius;
-                this.powerMode = false;
+                this.dx = baseSpeed * (Math.random() < 0.5 ? 1 : -1); this.dy = -baseSpeed;
+                this.active = false; this.radius = this.defaultRadius; this.powerMode = false;
             }
-
             draw(ctx) {
-                ctx.beginPath();
-                ctx.fillStyle = this.powerMode ? '#ff0' : '#fff';
-                if (this.powerMode) {
-                    ctx.shadowBlur = 10;
-                    ctx.shadowColor = '#ff0';
-                }
-                
-                ctx.fillRect(
-                    (this.x - this.radius) * scaleX, 
-                    (this.y - this.radius) * scaleY, 
-                    (this.radius * 2) * scaleX, 
-                    (this.radius * 2) * scaleX
-                );
-                ctx.shadowBlur = 0;
-                ctx.closePath();
+                ctx.beginPath(); ctx.fillStyle = this.powerMode ? '#ff0' : '#fff';
+                if (this.powerMode) { ctx.shadowBlur = 10; ctx.shadowColor = '#ff0'; }
+                ctx.fillRect((this.x - this.radius) * scaleX, (this.y - this.radius) * scaleY, (this.radius * 2) * scaleX, (this.radius * 2) * scaleX);
+                ctx.shadowBlur = 0; ctx.closePath();
             }
-
             update() {
-                if (!this.active) {
-                    this.x = paddle.x + paddle.width / 2;
-                    this.y = paddle.y - this.radius - 1;
-                    return;
-                }
-
-                this.x += this.dx;
-                this.y += this.dy;
-
-                if (this.x + this.radius > GAME_WIDTH || this.x - this.radius < 0) {
-                    this.dx = -this.dx;
-                    playSound('wall');
-                }
-                if (this.y - this.radius < 0) {
-                    this.dy = -this.dy;
-                    playSound('wall');
-                }
+                if (!this.active) { this.x = paddle.x + paddle.width / 2; this.y = paddle.y - this.radius - 1; return; }
+                this.x += this.dx; this.y += this.dy;
+                if (this.x + this.radius > GAME_WIDTH || this.x - this.radius < 0) { this.dx = -this.dx; playSound('wall'); }
+                if (this.y - this.radius < 0) { this.dy = -this.dy; playSound('wall'); }
             }
-            
             changeSpeed(multiplier) {
                 const currentSpeed = Math.sqrt(this.dx*this.dx + this.dy*this.dy);
                 const newSpeed = currentSpeed * multiplier;
                 if (newSpeed < 3 || newSpeed > 12 + level) return;
-                const ratio = newSpeed / currentSpeed;
-                this.dx *= ratio;
-                this.dy *= ratio;
+                const ratio = newSpeed / currentSpeed; this.dx *= ratio; this.dy *= ratio;
             }
         }
 
         class Paddle {
             constructor() {
-                this.defaultWidth = Math.max(100 - (level - 1) * 5, 60);
-                this.width = this.defaultWidth;
-                this.height = 15;
-                this.x = GAME_WIDTH / 2 - this.width / 2;
-                this.y = GAME_HEIGHT - 40;
-                this.speed = 8;
-                this.dx = 0;
-                
-                this.laserActive = false;
-                this.laserTimer = 0;
+                this.defaultWidth = Math.max(100 - (level - 1) * 5, 60); this.width = this.defaultWidth;
+                this.height = 15; this.x = GAME_WIDTH / 2 - this.width / 2; this.y = GAME_HEIGHT - 40;
+                this.speed = 8; this.dx = 0; this.laserActive = false; this.laserTimer = 0;
             }
-
             draw(ctx) {
-                ctx.fillStyle = this.laserActive ? '#f0f' : '#0ff';
-                ctx.shadowBlur = 10;
-                ctx.shadowColor = this.laserActive ? '#f0f' : '#0ff';
+                ctx.fillStyle = this.laserActive ? '#f0f' : '#0ff'; ctx.shadowBlur = 10; ctx.shadowColor = this.laserActive ? '#f0f' : '#0ff';
                 ctx.fillRect(this.x * scaleX, this.y * scaleY, this.width * scaleX, this.height * scaleY);
-                
                 if(this.laserActive) {
                     ctx.fillStyle = '#fff';
                     ctx.fillRect(this.x * scaleX, this.y * scaleY, 5 * scaleX, -5 * scaleY);
@@ -579,49 +612,26 @@
                 }
                 ctx.shadowBlur = 0;
             }
-
             update() {
                 this.x += this.dx;
-                if (this.x < 0) this.x = 0;
-                if (this.x + this.width > GAME_WIDTH) this.x = GAME_WIDTH - this.width;
-
+                if (this.x < 0) this.x = 0; if (this.x + this.width > GAME_WIDTH) this.x = GAME_WIDTH - this.width;
                 if(this.laserActive && gameRunning && ballStarted) {
                     this.laserTimer++;
                     if(this.laserTimer > 40) { 
-                        bullets.push(new Bullet(this.x, this.y));
-                        bullets.push(new Bullet(this.x + this.width - 5, this.y));
-                        this.laserTimer = 0;
-                        playSound('laser');
+                        bullets.push(new Bullet(this.x, this.y)); bullets.push(new Bullet(this.x + this.width - 5, this.y));
+                        this.laserTimer = 0; playSound('laser');
                     }
                 }
             }
-            
-            changeWidth(amount) {
-                this.width += amount;
-                if (this.width < 40) this.width = 40;
-                if (this.width > 250) this.width = 250;
-            }
+            changeWidth(amount) { this.width += amount; if (this.width < 40) this.width = 40; if (this.width > 250) this.width = 250; }
         }
 
         class Brick {
-            constructor(x, y, c) {
-                this.x = x;
-                this.y = y;
-                this.c = c;
-                this.width = 0;
-                this.height = 25;
-                this.status = 1;
-            }
-            
+            constructor(x, y, c) { this.x = x; this.y = y; this.c = c; this.width = 0; this.height = 25; this.status = 1; }
             draw(ctx) {
                 if (this.status === 1) {
                     ctx.fillStyle = brickColors[this.c % brickColors.length];
-                    ctx.fillRect(
-                        (this.x + 2) * scaleX, 
-                        (this.y + 2) * scaleY, 
-                        (this.width - 4) * scaleX, 
-                        (this.height - 4) * scaleY
-                    );
+                    ctx.fillRect((this.x + 2) * scaleX, (this.y + 2) * scaleY, (this.width - 4) * scaleX, (this.height - 4) * scaleY);
                 }
             }
         }
@@ -629,26 +639,11 @@
         /**
          * 게임 상태 관리
          */
-        let paddle;
-        let balls = [];
-        let bullets = [];
-        let bricks = [];
-        let particles = [];
-        let items = [];
-        
-        let score = 0;
-        let level = 1; 
-        
-        let gameRunning = false;
-        let animationId;
-        let ballStarted = false;
-        
-        let barrierActive = false;
-        let levelUpMsgTimer = 0; 
-
-        let rightPressed = false;
-        let leftPressed = false;
-        
+        let paddle; let balls = []; let bullets = []; let bricks = []; let particles = []; let items = [];
+        let score = 0; let level = 1; 
+        let gameRunning = false; let animationId; let ballStarted = false;
+        let barrierActive = false; let levelUpMsgTimer = 0; 
+        let rightPressed = false; let leftPressed = false;
         let brickColors = [];
 
         function getLevelColors(lvl) {
@@ -660,15 +655,10 @@
                 ['#f0f', '#ff0', '#0ff', '#fff', '#f00', '#00f'], 
                 ['#fff', '#aaa', '#555', '#222', '#f00', '#888']  
             ];
-            
-            if (lvl <= themes.length) {
-                return themes[lvl - 1];
-            } else {
-                let randomTheme = [];
-                let baseHue = Math.random() * 360;
-                for(let i=0; i<6; i++) {
-                    randomTheme.push(`hsl(${(baseHue + i * 40) % 360}, 100%, 50%)`);
-                }
+            if (lvl <= themes.length) return themes[lvl - 1];
+            else {
+                let randomTheme = []; let baseHue = Math.random() * 360;
+                for(let i=0; i<6; i++) randomTheme.push(`hsl(${(baseHue + i * 40) % 360}, 100%, 50%)`);
                 return randomTheme;
             }
         }
@@ -676,148 +666,108 @@
         function initBricks() {
             bricks = [];
             const rows = Math.min(6 + Math.floor((level - 1) / 2), 10);
-            const cols = 8;
-            const padding = 10;
-            const offsetTop = 60;
-            const offsetLeft = 35;
-            
+            const cols = 8; const padding = 10; const offsetTop = 60; const offsetLeft = 35;
             const brickWidth = (GAME_WIDTH - (offsetLeft * 2)) / cols;
-
             for(let c=0; c<cols; c++) {
                 for(let r=0; r<rows; r++) {
                     let b = new Brick(0, 0, r);
-                    b.x = (c * brickWidth) + offsetLeft;
-                    b.y = (r * (b.height + padding)) + offsetTop;
-                    b.width = brickWidth;
+                    b.x = (c * brickWidth) + offsetLeft; b.y = (r * (b.height + padding)) + offsetTop; b.width = brickWidth;
                     bricks.push(b);
                 }
             }
         }
 
+        /* --- 컨트롤러 이벤트 매핑 --- */
+        // 키보드
         document.addEventListener('keydown', keyDownHandler);
         document.addEventListener('keyup', keyUpHandler);
-        
-        function movePaddleByTouch(clientX) {
-            const rect = canvas.getBoundingClientRect();
-            const relativeX = clientX - rect.left;
-            const gameX = relativeX / scaleX;
-            paddle.x = gameX - paddle.width / 2;
-            if (paddle.x < 0) paddle.x = 0;
-            if (paddle.x + paddle.width > GAME_WIDTH) paddle.x = GAME_WIDTH - paddle.width;
-        }
-
-        canvas.addEventListener('mousemove', (e) => {
-            if(gameRunning) movePaddleByTouch(e.clientX);
-        });
-        
-        canvas.addEventListener('touchmove', (e) => {
-            if(gameRunning) {
-                e.preventDefault();
-                movePaddleByTouch(e.touches[0].clientX);
-            }
-        }, {passive: false});
-
-        canvas.addEventListener('click', () => {
-            if(gameRunning && !ballStarted) {
-                balls.forEach(b => b.active = true);
-                ballStarted = true;
-            }
-        });
 
         function keyDownHandler(e) {
             if(e.key === 'Right' || e.key === 'ArrowRight') rightPressed = true;
             else if(e.key === 'Left' || e.key === 'ArrowLeft') leftPressed = true;
-            else if(e.code === 'Space' && gameRunning && !ballStarted) {
-                balls.forEach(b => b.active = true);
-                ballStarted = true;
+            else if((e.code === 'Space' || e.key === 'Enter') && gameRunning && !ballStarted) {
+                balls.forEach(b => b.active = true); ballStarted = true;
             }
         }
-
         function keyUpHandler(e) {
             if(e.key === 'Right' || e.key === 'ArrowRight') rightPressed = false;
             else if(e.key === 'Left' || e.key === 'ArrowLeft') leftPressed = false;
         }
 
-        function spawnItem(x, y) {
-            if (Math.random() < 0.25) {
-                items.push(new Item(x, y));
-            }
+        // 가상 버튼 (마우스/터치)
+        const btnLeft = document.getElementById('btn-left');
+        const btnRight = document.getElementById('btn-right');
+        const btnA = document.getElementById('btn-a');
+        const btnB = document.getElementById('btn-b');
+        const btnStart = document.getElementById('btn-start');
+
+        // 버튼 이벤트 바인딩 헬퍼
+        function bindBtn(btn, actionDown, actionUp) {
+            btn.addEventListener('mousedown', (e) => { e.preventDefault(); actionDown(); });
+            btn.addEventListener('mouseup', (e) => { e.preventDefault(); actionUp(); });
+            btn.addEventListener('touchstart', (e) => { e.preventDefault(); actionDown(); });
+            btn.addEventListener('touchend', (e) => { e.preventDefault(); actionUp(); });
         }
 
-        function destroyBrick(b) {
-            b.status = 0;
-            score += 10;
-            // 인게임 점수는 캔버스에만 그림. DOM 업데이트 X
-            playSound('brick');
-            
-            for(let k=0; k<6; k++) {
-                particles.push(new Particle(b.x + b.width/2, b.y + b.height/2, brickColors[b.c % brickColors.length]));
+        bindBtn(btnLeft, () => leftPressed = true, () => leftPressed = false);
+        bindBtn(btnRight, () => rightPressed = true, () => rightPressed = false);
+        
+        // 시작/발사 버튼 공통 동작
+        const actionBtnHandler = () => {
+            if (gameRunning && !ballStarted) {
+                balls.forEach(b => b.active = true); ballStarted = true;
+            } else if (!gameRunning && uiLayer.style.display !== 'none') {
+                 startGame();
             }
+        };
+
+        bindBtn(btnA, actionBtnHandler, () => {});
+        bindBtn(btnB, actionBtnHandler, () => {});
+        bindBtn(btnStart, actionBtnHandler, () => {});
+        startBtn.addEventListener('click', startGame);
+
+
+        function spawnItem(x, y) { if (Math.random() < 0.25) items.push(new Item(x, y)); }
+
+        function destroyBrick(b) {
+            b.status = 0; score += 10; playSound('brick');
+            for(let k=0; k<6; k++) particles.push(new Particle(b.x + b.width/2, b.y + b.height/2, brickColors[b.c % brickColors.length]));
             spawnItem(b.x + b.width/2 - 12, b.y);
         }
 
         function nextLevel() {
-            level++;
-            playSound('levelup');
-            
-            // 최고 레벨 업데이트 체크
-            if(level > maxLevel) {
-                maxLevel = level;
-                localStorage.setItem(STORAGE_KEYS.MAX_LEVEL, maxLevel);
-            }
-
+            level++; playSound('levelup');
+            if(level > maxLevel) { maxLevel = level; localStorage.setItem(STORAGE_KEYS.MAX_LEVEL, maxLevel); }
             brickColors = getLevelColors(level);
-            
-            balls = [new Ball()];
-            ballStarted = false;
-            bullets = [];
-            items = [];
-            particles = [];
-            barrierActive = false;
-            paddle = new Paddle();
-            initBricks();
-            levelUpMsgTimer = 120; 
+            balls = [new Ball()]; ballStarted = false; bullets = []; items = []; particles = []; barrierActive = false; paddle = new Paddle();
+            initBricks(); levelUpMsgTimer = 120; 
         }
 
         function collisionDetection() {
             let activeBricks = bricks.filter(b => b.status === 1).length;
-            if(activeBricks === 0) {
-                nextLevel(); 
-            }
+            if(activeBricks === 0) nextLevel(); 
 
             balls.forEach(ball => {
                 if(!ball.active) return;
-
                 for(let i=0; i<bricks.length; i++) {
                     let b = bricks[i];
                     if(b.status === 1) {
                         if(ball.x > b.x && ball.x < b.x + b.width && ball.y > b.y && ball.y < b.y + b.height) {
-                            if (!ball.powerMode) {
-                                ball.dy = -ball.dy;
-                            }
+                            if (!ball.powerMode) ball.dy = -ball.dy;
                             destroyBrick(b);
                         }
                     }
                 }
-
-                if (ball.y + ball.radius >= paddle.y && 
-                    ball.y - ball.radius <= paddle.y + paddle.height &&
-                    ball.x >= paddle.x && 
-                    ball.x <= paddle.x + paddle.width) {
-                    
+                if (ball.y + ball.radius >= paddle.y && ball.y - ball.radius <= paddle.y + paddle.height &&
+                    ball.x >= paddle.x && ball.x <= paddle.x + paddle.width) {
                     if (ball.dy > 0) {
-                        ball.dy = -ball.dy;
-                        const hitPoint = ball.x - (paddle.x + paddle.width / 2);
-                        ball.dx = hitPoint * 0.15; 
-                        if(Math.abs(ball.dx) < 2) ball.dx = (ball.dx < 0 ? -2 : 2);
+                        ball.dy = -ball.dy; const hitPoint = ball.x - (paddle.x + paddle.width / 2);
+                        ball.dx = hitPoint * 0.15; if(Math.abs(ball.dx) < 2) ball.dx = (ball.dx < 0 ? -2 : 2);
                         playSound('paddle');
                     }
                 }
-
                 if (barrierActive && ball.y + ball.radius > GAME_HEIGHT - 10) {
-                    ball.dy = -Math.abs(ball.dy); 
-                    barrierActive = false; 
-                    playSound('barrier');
+                    ball.dy = -Math.abs(ball.dy); barrierActive = false; playSound('barrier');
                 }
             });
 
@@ -827,9 +777,7 @@
                     let b = bricks[i];
                     if(b.status === 1) {
                         if(bullet.x > b.x && bullet.x < b.x + b.width && bullet.y > b.y && bullet.y < b.y + b.height) {
-                            bullet.active = false;
-                            destroyBrick(b);
-                            break; 
+                            bullet.active = false; destroyBrick(b); break; 
                         }
                     }
                 }
@@ -837,186 +785,88 @@
         }
 
         function draw() {
-            ctx.fillStyle = 'rgba(5, 5, 5, 0.3)';
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            ctx.fillStyle = 'rgba(5, 5, 5, 0.3)'; ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-            // 캔버스 내 HUD (인게임)
-            ctx.fillStyle = '#fff';
-            ctx.font = `${20 * scaleX}px "Press Start 2P"`;
-            ctx.textAlign = 'left';
-            ctx.textBaseline = 'top';
-            ctx.fillText(`SCORE: ${score}`, 20 * scaleX, 20 * scaleY);
+            // 캔버스 내 HUD (인게임) - 상단 바 스타일
+            ctx.fillStyle = '#000'; ctx.fillRect(0, 0, canvas.width, 40 * scaleY);
+            ctx.strokeStyle = '#333'; ctx.lineWidth = 2; ctx.beginPath(); ctx.moveTo(0, 40 * scaleY); ctx.lineTo(canvas.width, 40 * scaleY); ctx.stroke();
             
-            ctx.textAlign = 'right';
-            ctx.fillText(`LVL: ${level}`, GAME_WIDTH * scaleX - 20, 20 * scaleY);
+            ctx.fillStyle = '#fff'; ctx.font = `${14 * scaleX}px "Press Start 2P"`; ctx.textBaseline = 'middle';
+            ctx.textAlign = 'left'; ctx.fillText(`SCORE:${score}`, 10 * scaleX, 20 * scaleY);
+            ctx.textAlign = 'right'; ctx.fillText(`LVL:${level}`, GAME_WIDTH * scaleX - 10, 20 * scaleY);
 
             if(levelUpMsgTimer > 0) {
-                ctx.fillStyle = `rgba(255, 255, 0, ${levelUpMsgTimer / 60})`; 
-                ctx.font = `${40 * scaleX}px "Press Start 2P"`;
-                ctx.textAlign = 'center';
-                ctx.textBaseline = 'middle';
-                ctx.fillText(`LEVEL ${level}`, (GAME_WIDTH/2) * scaleX, (GAME_HEIGHT/2) * scaleY);
+                ctx.fillStyle = `rgba(255, 255, 0, ${levelUpMsgTimer / 60})`; ctx.font = `${40 * scaleX}px "Press Start 2P"`;
+                ctx.textAlign = 'center'; ctx.fillText(`LEVEL ${level}`, (GAME_WIDTH/2) * scaleX, (GAME_HEIGHT/2) * scaleY);
                 levelUpMsgTimer--;
             }
 
-            if(rightPressed) paddle.dx = paddle.speed;
-            else if(leftPressed) paddle.dx = -paddle.speed;
-            else paddle.dx = 0;
-            paddle.update();
-            paddle.draw(ctx);
+            if(rightPressed) paddle.dx = paddle.speed; else if(leftPressed) paddle.dx = -paddle.speed; else paddle.dx = 0;
+            paddle.update(); paddle.draw(ctx);
             
             for(let i = balls.length -1; i >= 0; i--) {
-                let b = balls[i];
-                b.update();
-                b.draw(ctx);
-                if(b.y - b.radius > GAME_HEIGHT) {
-                    balls.splice(i, 1);
-                }
+                let b = balls[i]; b.update(); b.draw(ctx);
+                if(b.y - b.radius > GAME_HEIGHT) balls.splice(i, 1);
             }
 
-            if(balls.length === 0 && gameRunning) {
-                gameOver();
-            }
+            if(balls.length === 0 && gameRunning) gameOver();
 
             for(let i = bullets.length -1; i >= 0; i--) {
-                bullets[i].update();
-                bullets[i].draw(ctx);
-                if(!bullets[i].active) bullets.splice(i, 1);
+                bullets[i].update(); bullets[i].draw(ctx); if(!bullets[i].active) bullets.splice(i, 1);
             }
-
             bricks.forEach(brick => brick.draw(ctx));
-
             for (let i = particles.length - 1; i >= 0; i--) {
-                particles[i].update();
-                particles[i].draw(ctx);
-                if (particles[i].life <= 0) particles.splice(i, 1);
+                particles[i].update(); particles[i].draw(ctx); if (particles[i].life <= 0) particles.splice(i, 1);
             }
-
             if(barrierActive) {
-                ctx.fillStyle = '#a0f';
-                ctx.globalAlpha = 0.5;
-                ctx.fillRect(0, (GAME_HEIGHT - 10) * scaleY, GAME_WIDTH * scaleX, 10 * scaleY);
-                ctx.globalAlpha = 1.0;
+                ctx.fillStyle = '#a0f'; ctx.globalAlpha = 0.5; ctx.fillRect(0, (GAME_HEIGHT - 10) * scaleY, GAME_WIDTH * scaleX, 10 * scaleY); ctx.globalAlpha = 1.0;
             }
-
             for (let i = items.length - 1; i >= 0; i--) {
-                let item = items[i];
-                item.update();
-                item.draw(ctx);
-
-                if (item.y > GAME_HEIGHT) {
-                    items.splice(i, 1);
-                    continue;
-                }
-
-                if (item.x < paddle.x + paddle.width &&
-                    item.x + item.width > paddle.x &&
-                    item.y < paddle.y + paddle.height &&
-                    item.y + item.height > paddle.y) {
-                    
-                    applyItemEffect(item.type);
-                    items.splice(i, 1);
+                let item = items[i]; item.update(); item.draw(ctx);
+                if (item.y > GAME_HEIGHT) { items.splice(i, 1); continue; }
+                if (item.x < paddle.x + paddle.width && item.x + item.width > paddle.x && item.y < paddle.y + paddle.height && item.y + item.height > paddle.y) {
+                    applyItemEffect(item.type); items.splice(i, 1);
                 }
             }
-
             collisionDetection();
-
-            if(gameRunning) {
-                animationId = requestAnimationFrame(draw);
-            }
+            if(gameRunning) animationId = requestAnimationFrame(draw);
         }
 
         function applyItemEffect(type) {
-            let isBad = (type === 'narrow' || type === 'fast' || type === 'tiny');
-            playSound(isBad ? 'badItem' : 'goodItem');
-
+            let isBad = (type === 'narrow' || type === 'fast' || type === 'tiny'); playSound(isBad ? 'badItem' : 'goodItem');
             switch(type) {
                 case 'wide': paddle.changeWidth(30); break;
                 case 'narrow': paddle.changeWidth(-30); break;
                 case 'slow': balls.forEach(b => b.changeSpeed(0.8)); break;
                 case 'fast': balls.forEach(b => b.changeSpeed(1.3)); break;
-                
                 case 'multi': 
-                    let newBalls = [];
-                    balls.forEach(b => {
-                        newBalls.push(new Ball(b.x, b.y, b.dx - 2, b.dy));
-                        newBalls.push(new Ball(b.x, b.y, b.dx + 2, b.dy));
-                    });
-                    balls = balls.concat(newBalls);
-                    break;
-
+                    let newBalls = []; balls.forEach(b => { newBalls.push(new Ball(b.x, b.y, b.dx - 2, b.dy)); newBalls.push(new Ball(b.x, b.y, b.dx + 2, b.dy)); });
+                    balls = balls.concat(newBalls); break;
                 case 'barrier': barrierActive = true; break;
                 case 'giant': balls.forEach(b => b.radius = 16); break;
                 case 'tiny': balls.forEach(b => b.radius = 4); break;
-                case 'power':
-                    balls.forEach(b => b.powerMode = true);
-                    setTimeout(() => {
-                        balls.forEach(b => b.powerMode = false);
-                    }, 5000);
-                    break;
-                case 'laser':
-                    paddle.laserActive = true;
-                    setTimeout(() => {
-                        paddle.laserActive = false;
-                    }, 8000); 
-                    break;
+                case 'power': balls.forEach(b => b.powerMode = true); setTimeout(() => { balls.forEach(b => b.powerMode = false); }, 5000); break;
+                case 'laser': paddle.laserActive = true; setTimeout(() => { paddle.laserActive = false; }, 8000); break;
             }
         }
 
         function startGame() {
-            initAudio();
-            uiLayer.style.display = 'none';
-            score = 0;
-            level = 1; 
-            // 게임 시작 시 UI가 아닌 캔버스에 그릴 예정이므로 DOM 업데이트는 필요 없음
-            
-            brickColors = getLevelColors(level);
-            
-            paddle = new Paddle();
-            balls = [new Ball()]; 
-            bullets = [];
-            items = [];
-            barrierActive = false;
-            initBricks();
-            particles = [];
-            ballStarted = false;
-            
-            gameRunning = true;
-            draw();
+            initAudio(); uiLayer.style.display = 'none';
+            score = 0; level = 1; brickColors = getLevelColors(level);
+            paddle = new Paddle(); balls = [new Ball()]; bullets = []; items = []; barrierActive = false;
+            initBricks(); particles = []; ballStarted = false;
+            gameRunning = true; resizeCanvas(); draw();
         }
 
         function gameOver() {
-            gameRunning = false;
-            cancelAnimationFrame(animationId);
-            playSound('over');
+            gameRunning = false; cancelAnimationFrame(animationId); playSound('over');
+            lastScore = score; lastLevel = level;
+            if (score > highScore) highScore = score; if (level > maxLevel) maxLevel = level;
+            localStorage.setItem(STORAGE_KEYS.HIGH_SCORE, highScore); localStorage.setItem(STORAGE_KEYS.MAX_LEVEL, maxLevel);
+            localStorage.setItem(STORAGE_KEYS.LAST_SCORE, lastScore); localStorage.setItem(STORAGE_KEYS.LAST_LEVEL, lastLevel);
             
-            // 데이터 저장 및 갱신
-            lastScore = score;
-            lastLevel = level;
-            
-            if (score > highScore) {
-                highScore = score;
-            }
-            if (level > maxLevel) {
-                maxLevel = level;
-            }
-
-            // 로컬 스토리지에 저장
-            localStorage.setItem(STORAGE_KEYS.HIGH_SCORE, highScore);
-            localStorage.setItem(STORAGE_KEYS.MAX_LEVEL, maxLevel);
-            localStorage.setItem(STORAGE_KEYS.LAST_SCORE, lastScore);
-            localStorage.setItem(STORAGE_KEYS.LAST_LEVEL, lastLevel);
-            
-            // UI 업데이트
-            titleText.innerHTML = "GAME OVER";
-            startBtn.innerText = "TRY AGAIN";
-            updateStatsUI();
-            
-            uiLayer.style.display = 'flex';
+            startBtn.innerText = "TRY AGAIN"; updateStatsUI(); uiLayer.style.display = 'flex';
         }
-
-        startBtn.addEventListener('click', startGame);
-
     </script>
 </body>
 </html>

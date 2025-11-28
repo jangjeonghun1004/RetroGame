@@ -442,8 +442,18 @@
             scaleX = canvas.width / GAME_WIDTH;
             scaleY = canvas.height / GAME_HEIGHT;
         }
-        window.addEventListener('load', resizeCanvas);
+        
+        // [수정] 포커스 문제 해결을 위한 초기화 로직 변경
+        window.addEventListener('load', () => {
+            resizeCanvas();
+            window.focus(); // 로드시 윈도우 포커스
+        });
         window.addEventListener('resize', resizeCanvas);
+        
+        // 화면 클릭시 포커스 확보 (iframe 환경 대응)
+        document.addEventListener('click', function() {
+            window.focus();
+        });
 
         /**
          * 오디오 시스템
@@ -763,8 +773,8 @@
             showScreen(screenRanking);
         });
 
-
-        function spawnItem(x, y) { if (Math.random() < 0.25) items.push(new Item(x, y)); }
+        // 아이템 드롭 확률
+        function spawnItem(x, y) { if (Math.random() < 0.5) items.push(new Item(x, y)); }
 
         function destroyBrick(b) {
             b.status = 0; score += 10; playSound('brick');

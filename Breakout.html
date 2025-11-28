@@ -25,11 +25,9 @@
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            /* 모바일 브라우저 UI 대응을 위한 dvh 사용 */
             height: 100vh;
             height: 100dvh; 
             overflow: hidden;
-            /* 노치 디자인 대응 */
             padding-top: env(safe-area-inset-top);
             padding-bottom: env(safe-area-inset-bottom);
         }
@@ -39,29 +37,27 @@
             background-color: #e0e0e0;
             width: 100%;
             max-width: 420px;
-            /* 높이 유동성 확보 (상하단 여유) */
-            height: 96%; 
             height: calc(100dvh - 10px); 
             max-height: 850px;
             border-radius: 15px;
-            padding: 10px; /* 패딩 축소 */
+            padding: 10px;
             padding-bottom: 5px;
             display: flex;
             flex-direction: column;
             box-shadow: 
-                0 0 0 2px #d0d0d0, /* 테두리 두께 축소 */
+                0 0 0 2px #d0d0d0,
                 0 10px 20px rgba(0,0,0,0.5),
                 inset 0 -5px 10px rgba(0,0,0,0.1);
             position: relative;
         }
 
-        /* --- 화면 영역 (남는 공간 모두 차지) --- */
+        /* --- 화면 영역 (비율 확대) --- */
         .screen-bezel {
             background-color: #111;
             border-radius: 8px;
             padding: 8px;
-            flex: 1; /* 가변 높이 */
-            min-height: 40%; /* 최소 높이 보장 */
+            flex: 1; 
+            min-height: 40%;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -121,7 +117,7 @@
         .screen-ui.active { display: flex; }
 
         h1 {
-            font-size: 16px; /* 폰트 사이즈 더 축소 */
+            font-size: 16px;
             margin-bottom: 10px;
             color: #0ff;
             text-shadow: 2px 2px #f0f;
@@ -188,54 +184,88 @@
             text-align: center; margin: 12px 0; text-transform: uppercase; outline: none;
         }
 
-        /* --- 컨트롤러 영역 (고정 크기) --- */
+        /* --- 컨트롤러 영역 --- */
         .controls-area {
-            flex: 0 0 auto; /* 높이 고정 (내용물 크기만큼) */
+            flex: 0 0 auto;
             display: grid;
             grid-template-columns: 1fr 1fr;
-            grid-template-rows: auto auto; 
+            /* 행 제거 (중앙 버튼 삭제됨) */
+            align-items: center;
             gap: 2px; 
-            padding: 0 2px 2px 2px;
-            /* 높이 제한이 있는 경우 컨트롤러 크기 조절 */
+            padding: 5px 2px;
             max-height: 40vh; 
         }
 
-        /* 십자키 */
+        /* 십자키 (D-Pad) - 크기 확대 (100px -> 140px) */
         .d-pad-container { 
-            position: relative; width: 100px; height: 100px; /* 크기 축소 */
-            justify-self: center; align-self: center; 
+            position: relative; 
+            width: 140px; 
+            height: 140px; 
+            justify-self: center; 
+            align-self: center; 
         }
         .d-pad { position: relative; width: 100%; height: 100%; }
-        .d-pad div { position: absolute; background: #333; border-radius: 4px; box-shadow: inset 1px 1px 2px rgba(255,255,255,0.2), 2px 2px 5px rgba(0,0,0,0.3); cursor: pointer; }
-        .d-pad div:active { background: #222; transform: scale(0.95); }
-        .d-pad-h { top: 33px; left: 0; width: 100px; height: 34px; z-index: 1; }
-        .d-pad-v { top: 0; left: 33px; width: 34px; height: 100px; z-index: 1; }
-        .d-pad-center { top: 33px; left: 33px; width: 34px; height: 34px; background: radial-gradient(circle at 30% 30%, #444, #222); z-index: 2; border-radius: 50%; }
-        /* 터치 영역 */
-        .d-btn { position: absolute; z-index: 10; opacity: 0; cursor: pointer; }
-        .btn-up { top: 0; left: 33px; width: 34px; height: 34px; }
-        .btn-down { bottom: 0; left: 33px; width: 34px; height: 34px; }
-        .btn-left { top: 33px; left: 0; width: 34px; height: 34px; }
-        .btn-right { top: 33px; right: 0; width: 34px; height: 34px; }
+        
+        .d-pad div { position: absolute; background: #333; border-radius: 6px; box-shadow: inset 1px 1px 2px rgba(255,255,255,0.2), 2px 2px 5px rgba(0,0,0,0.3); }
+        
+        .d-pad-h:active, .d-pad-v:active { background: #222; transform: scale(0.95); }
+        
+        /* 십자키 내부 치수 조정 (비율 유지하며 확대) */
+        .d-pad-h { top: 46px; left: 0; width: 140px; height: 48px; z-index: 1; }
+        .d-pad-v { top: 0; left: 46px; width: 48px; height: 140px; z-index: 1; }
+        
+        .d-pad-center { 
+            top: 46px; left: 46px; width: 48px; height: 48px; 
+            background: radial-gradient(circle at 30% 30%, #444, #222); 
+            z-index: 2; 
+            border-radius: 50%; 
+            pointer-events: none; 
+            box-shadow: inset 1px 1px 2px rgba(255,255,255,0.1);
+        }
+        
+        /* 터치 영역 확대 */
+        .d-btn { 
+            position: absolute; z-index: 10; opacity: 0; cursor: pointer; 
+        }
+        .btn-up { top: -15px; left: 30px; width: 80px; height: 75px; }
+        .btn-down { bottom: -15px; left: 30px; width: 80px; height: 75px; }
+        .btn-left { top: 30px; left: -15px; width: 75px; height: 80px; }
+        .btn-right { top: 30px; right: -15px; width: 75px; height: 80px; }
 
         /* 액션 버튼 */
         .action-buttons { 
-            position: relative; width: 110px; height: 110px; /* 크기 축소 */
+            position: relative; width: 120px; height: 120px; /* 액션 버튼 영역도 약간 확대 */
             justify-self: center; align-self: center; transform: rotate(-15deg); 
         }
-        .abxy-btn { position: absolute; width: 30px; height: 30px; border-radius: 50%; background: #333; color: rgba(255,255,255,0.8); display: flex; align-items: center; justify-content: center; font-family: 'Roboto', sans-serif; font-weight: bold; font-size: 12px; box-shadow: 0 3px 0 #111, 0 5px 5px rgba(0,0,0,0.3); cursor: pointer; transition: transform 0.1s, box-shadow 0.1s; }
+        .abxy-btn { 
+            position: absolute; width: 34px; height: 34px; 
+            border-radius: 50%; background: #333; 
+            color: rgba(255,255,255,0.9); 
+            display: flex; align-items: center; justify-content: center; 
+            font-family: 'Roboto', sans-serif; font-weight: bold; 
+            font-size: 14px; 
+            box-shadow: 0 3px 0 #111, 0 5px 5px rgba(0,0,0,0.3); 
+            cursor: pointer; transition: transform 0.1s, box-shadow 0.1s; 
+        }
         .abxy-btn:active { transform: translateY(3px); box-shadow: 0 0 0 #111, inset 0 2px 5px rgba(0,0,0,0.5); }
-        .btn-x { top: 4px; left: 40px; color: #40a0ff; }
-        .btn-y { top: 40px; left: 4px; color: #40ff40; }
-        .btn-b { top: 40px; right: 4px; color: #ffd040; }
-        .btn-a { bottom: 4px; left: 40px; color: #ff4040; }
+        
+        .btn-x { top: 5px; left: 43px; color: #40a0ff; }
+        .btn-y { 
+            top: 43px; left: 5px; 
+            color: #40ff40; 
+            font-size: 8px; /* Select 텍스트용 폰트 */
+            letter-spacing: -0.5px;
+        }
+        .btn-b { 
+            top: 43px; right: 5px; 
+            color: #ffd040; 
+            font-size: 8px; /* Start 텍스트용 폰트 */
+            letter-spacing: -0.5px;
+        }
+        .btn-a { bottom: 5px; left: 43px; color: #ff4040; }
 
-        /* 기능 버튼 */
-        .center-buttons { grid-column: 1 / -1; display: flex; justify-content: center; gap: 15px; margin: 5px 0; }
-        .fn-btn-group { display: flex; flex-direction: column; align-items: center; gap: 2px; }
-        .fn-btn { width: 40px; height: 10px; background: #555; border-radius: 6px; transform: rotate(-20deg); box-shadow: 0 2px 2px rgba(0,0,0,0.3); cursor: pointer; }
-        .fn-btn:active { transform: rotate(-20deg) scale(0.95); background: #444; }
-        .fn-label { font-family: 'Roboto', sans-serif; font-size: 6px; color: #888; font-weight: bold; text-transform: uppercase; }
+        /* 중앙 버튼 제거로 인한 스타일 삭제 */
+        /* .center-buttons { display: none; } */
 
         .mobile-controls { display: none; }
     </style>
@@ -309,13 +339,13 @@
                 </div>
             </div>
             <div class="action-buttons">
-                <div class="abxy-btn btn-x">X</div><div class="abxy-btn btn-y">Y</div>
-                <div class="abxy-btn btn-b" id="btn-b">B</div><div class="abxy-btn btn-a" id="btn-a">A</div>
+                <!-- Y: Select, B: Start 텍스트 적용 -->
+                <div class="abxy-btn btn-x">X</div>
+                <div class="abxy-btn btn-y" id="btn-y">SELECT</div>
+                <div class="abxy-btn btn-b" id="btn-b">START</div>
+                <div class="abxy-btn btn-a" id="btn-a">A</div>
             </div>
-            <div class="center-buttons">
-                <div class="fn-btn-group"><div class="fn-btn" id="btn-select"></div><span class="fn-label">Select</span></div>
-                <div class="fn-btn-group"><div class="fn-btn" id="btn-start"></div><span class="fn-label">Start</span></div>
-            </div>
+            <!-- 중앙 버튼 영역 삭제됨 -->
         </div>
     </div>
 
@@ -385,10 +415,7 @@
                 div.className = 'rank-row';
                 
                 // 1, 2, 3등 특별 아이콘 처리 (숫자와 아이콘 함께 표시)
-                let rankDisplay = `${index + 1}.`;
-                if (index === 0) rankDisplay = '1. 🥇';
-                else if (index === 1) rankDisplay = '2. 🥈';
-                else if (index === 2) rankDisplay = '3. 🥉';
+                let rankDisplay = `${index + 1}.`;                
 
                 div.innerHTML = `
                     <span class="rank-rank">${rankDisplay}</span>
@@ -670,9 +697,14 @@
         const btnRight = document.getElementById('btn-right');
         const btnA = document.getElementById('btn-a');
         const btnB = document.getElementById('btn-b');
-        const btnStart = document.getElementById('btn-start');
+        // btnY(Select), btnStart 제거됨 -> Y, B가 대체
+
+        // Y(Select), B(Start)
+        const btnY = document.getElementById('btn-y'); // New Select
+        // btnB is already defined but text changed.
 
         function bindBtn(btn, actionDown, actionUp) {
+            if(!btn) return;
             btn.addEventListener('mousedown', (e) => { e.preventDefault(); actionDown(); });
             btn.addEventListener('mouseup', (e) => { e.preventDefault(); actionUp(); });
             btn.addEventListener('touchstart', (e) => { e.preventDefault(); actionDown(); });
@@ -688,16 +720,26 @@
             } else if (gameRunning && !ballStarted) {
                 balls.forEach(b => b.active = true); ballStarted = true;
             } else if (screenGameOver.classList.contains('active')) {
-                // 게임 오버 상태에선 버튼 누르면 재시작 (TRY AGAIN 버튼과 동일)
                 startGame();
             } else if (screenRanking.classList.contains('active')) {
                 showScreen(screenStart);
             }
         }
 
-        bindBtn(btnA, handleActionBtn, () => {});
+        // B 버튼(Start) = 액션 버튼
         bindBtn(btnB, handleActionBtn, () => {});
-        bindBtn(btnStart, handleActionBtn, () => {});
+        // A 버튼도 액션 가능
+        bindBtn(btnA, handleActionBtn, () => {});
+        
+        // Y 버튼(Select) - 랭킹 보기 등 보조 기능
+        bindBtn(btnY, () => {
+            if (screenStart.classList.contains('active')) {
+                renderRankings(rankingList); showScreen(screenRanking);
+            } else if (screenRanking.classList.contains('active')) {
+                showScreen(screenStart);
+            }
+        }, () => {});
+
 
         // 화면 UI 버튼 바인딩
         startBtn.addEventListener('click', startGame);

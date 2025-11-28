@@ -385,11 +385,13 @@
         // 로컬 스토리지 키
         const STORAGE_KEYS = {
             HIGH_SCORE: 'retroBreakout_highScore',
-            RANKINGS: 'retroBreakout_rankings'
+            RANKINGS: 'retroBreakout_rankings',
+            MAX_LEVEL: 'retroBreakout_maxLevel'
         };
 
         // 데이터 로드
         let highScore = parseInt(localStorage.getItem(STORAGE_KEYS.HIGH_SCORE)) || 0;
+        let maxLevel = parseInt(localStorage.getItem(STORAGE_KEYS.MAX_LEVEL)) || 1;
         let rankings = JSON.parse(localStorage.getItem(STORAGE_KEYS.RANKINGS)) || [
             { name: 'AAA', score: 2000 },
             { name: 'BBB', score: 1500 },
@@ -899,6 +901,7 @@
             // 하이 스코어 갱신
             if (score > highScore) { highScore = score; localStorage.setItem(STORAGE_KEYS.HIGH_SCORE, highScore); }
             startHighScoreDisplay.innerText = highScore;
+            localStorage.setItem(STORAGE_KEYS.MAX_LEVEL, maxLevel);
 
             // 랭킹 진입 여부 확인 (5위 점수보다 높으면)
             let lowestScore = rankings.length < 5 ? 0 : rankings[rankings.length - 1].score;

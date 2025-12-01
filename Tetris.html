@@ -339,7 +339,8 @@
             </div>
             <div class="action-buttons">
                 <!-- Y: Select, B: Start / Action -->
-                <div class="abxy-btn btn-x">X</div>
+                <!-- [수정] X 버튼에 ID 추가 -->
+                <div class="abxy-btn btn-x" id="btn-x">X</div>
                 <div class="abxy-btn btn-y" id="btn-y">SELECT</div>
                 <div class="abxy-btn btn-b" id="btn-b">START</div>
                 <div class="abxy-btn btn-a" id="btn-a">A</div>
@@ -429,7 +430,7 @@
         const ROWS = 20;
         let boardX = 0; // 보드 그리기 시작 X 좌표
         let boardY = 0; // 보드 그리기 시작 Y 좌표
-        const UI_HEIGHT = 50; // [수정] 헤더 높이 확보 (40px -> 50px)
+        const UI_HEIGHT = 40; // [수정] 높이를 벽돌깨기와 동일하게 40px로 축소
 
         function resizeCanvas() {
             const containerWidth = gameContainer.clientWidth;
@@ -877,9 +878,10 @@
         const btnUp = document.getElementById('btn-up'); // Rotate
         const btnDown = document.getElementById('btn-down'); // Soft Drop
         
-        const btnA = document.getElementById('btn-a'); // Rotate
-        const btnB = document.getElementById('btn-b'); // Hard Drop
-        const btnY = document.getElementById('btn-y'); // Select (View Ranking)
+        const btnA = document.getElementById('btn-a'); // Hard Drop
+        const btnB = document.getElementById('btn-b'); // Start/Menu
+        // const btnY = document.getElementById('btn-y'); // Select (기능 제거됨)
+        const btnX = document.getElementById('btn-x'); // [수정] X 버튼 (기능 추가됨)
 
         function bindBtn(btn, action) {
             if(!btn) return;
@@ -898,20 +900,18 @@
         bindBtn(btnDown, () => { if(gameRunning) playerDrop(); });
         bindBtn(btnUp, () => { if(gameRunning) playerRotate(1); }); // 상키 = 회전
         
-        // [수정] A 버튼: 회전 -> 하드 드롭 (Start 버튼 기능 이관)
+        // A 버튼: 하드 드롭
         bindBtn(btnA, () => { 
             if(gameRunning) playerHardDrop(); 
             else handleActionBtn(); // 메뉴 선택 기능 겸함
         }); 
         
-        // [수정] START(B) 버튼: 하드 드롭 기능 제거 (메뉴/시작 기능만 유지)
+        // START(B) 버튼: 메뉴/시작
         bindBtn(btnB, () => { 
-            // 게임 중에는 아무 동작 안함 (기능이 A로 이동됨)
-            // 메뉴에서는 Start/Confirm 역할
             if(!gameRunning) handleActionBtn(); 
         });
 
-        // 공통 액션 (Start / Select / UI 버튼)
+        // 공통 액션 (Start / UI 버튼)
         function handleActionBtn() {
             if (screenStart.classList.contains('active')) {
                 startGame();
@@ -922,12 +922,12 @@
             }
         }
 
-        // [수정] SELECT(Y) 버튼: 랭킹 보기 + 게임 중 회전 (A 버튼 기능 이관)
-        bindBtn(btnY, () => {
+        // [수정] X 버튼: 랭킹 보기 + 게임 중 회전 (Select 버튼 기능 이관)
+        bindBtn(btnX, () => {
             if (gameRunning) {
                 playerRotate(1); // 게임 중에는 회전
             } else {
-                // 메뉴에서는 랭킹 보기 (기존 로직)
+                // 메뉴에서는 랭킹 보기
                 if (screenStart.classList.contains('active')) {
                     renderRankings(rankingList); showScreen(screenRanking);
                 } else if (screenRanking.classList.contains('active')) {

@@ -429,7 +429,7 @@
         const ROWS = 20;
         let boardX = 0; // 보드 그리기 시작 X 좌표
         let boardY = 0; // 보드 그리기 시작 Y 좌표
-        const UI_HEIGHT = 60; // 상단 UI 영역 높이
+        const UI_HEIGHT = 50; // [수정] 헤더 높이 확보 (40px -> 50px)
 
         function resizeCanvas() {
             const containerWidth = gameContainer.clientWidth;
@@ -437,9 +437,10 @@
             canvas.width = containerWidth;
             canvas.height = containerHeight;
             
-            // 상단 UI 영역(UI_HEIGHT)을 제외한 나머지 공간에서 타일 크기 계산
-            // 하단 여백 10px 추가 확보
-            const availableHeight = containerHeight - UI_HEIGHT - 10;
+            // 상단 UI 영역 + 보드 테두리 여백(10px) 확보
+            const topPadding = 10;
+            const bottomPadding = 10;
+            const availableHeight = containerHeight - UI_HEIGHT - topPadding - bottomPadding;
             
             // 타일 크기 계산 (화면 꽉 차게)
             tileSize = Math.floor(availableHeight / ROWS);
@@ -449,9 +450,9 @@
                 tileSize = Math.floor((containerWidth - 20) / COLS);
             }
 
-            // 보드 중앙 정렬 (Y축은 UI_HEIGHT 아래부터 시작)
+            // 보드 중앙 정렬 (Y축은 UI_HEIGHT + topPadding 아래부터 시작하여 겹침 방지)
             boardX = Math.floor((containerWidth - (COLS * tileSize)) / 2);
-            boardY = UI_HEIGHT + Math.floor((availableHeight - (ROWS * tileSize)) / 2);
+            boardY = UI_HEIGHT + topPadding + Math.floor((availableHeight - (ROWS * tileSize)) / 2);
         }
         
         window.addEventListener('load', () => {
@@ -601,9 +602,9 @@
             ctx.fillStyle = '#050505';
             ctx.fillRect(0, 0, canvas.width, canvas.height);
             
-            // --- 상단 UI 영역 그리기 ---
+            // --- 상단 UI 영역 그리기 (벽돌 깨기 스타일) ---
             // UI 배경바
-            ctx.fillStyle = '#1a1a1a';
+            ctx.fillStyle = '#000'; // 완전 검정으로 변경하여 깔끔하게
             ctx.fillRect(0, 0, canvas.width, UI_HEIGHT);
             
             // UI 구분선
@@ -614,44 +615,36 @@
             ctx.lineTo(canvas.width, UI_HEIGHT);
             ctx.stroke();
 
-            // 텍스트 설정 공통
-            const textY_Label = 25;
-            const textY_Value = 48;
-            const paddingX = 20;
+            // 텍스트 설정 (한 줄 배치)
+            ctx.textBaseline = 'middle';
+            ctx.font = '14px "Press Start 2P"'; // 폰트 크기 통일
+            const textY = UI_HEIGHT / 2; // 수직 중앙 정렬
+            const paddingX = 15;
 
-            // SCORE
+            // SCORE: 0
             ctx.textAlign = 'left';
-            ctx.fillStyle = '#888'; // 라벨 색상 (회색)
-            ctx.font = '10px "Press Start 2P"';
-            ctx.fillText('SCORE', paddingX, textY_Label);
-            
-            ctx.fillStyle = '#0f0'; // 점수 색상 (녹색 형광)
-            ctx.font = '16px "Press Start 2P"';
-            ctx.fillText(score, paddingX, textY_Value);
+            ctx.fillStyle = '#fff'; // [수정] 벽돌 깨기와 동일하게 흰색으로 변경
+            ctx.fillText(`SCORE:${score}`, paddingX, textY);
 
-            // LEVEL
+            // LVL: 1
             ctx.textAlign = 'right';
-            ctx.fillStyle = '#888'; // 라벨 색상
-            ctx.font = '10px "Press Start 2P"';
-            ctx.fillText('LEVEL', canvas.width - paddingX, textY_Label);
-            
-            ctx.fillStyle = '#ff0'; // 레벨 색상 (노란 형광)
-            ctx.font = '16px "Press Start 2P"';
-            ctx.fillText(level, canvas.width - paddingX, textY_Value);
+            ctx.fillStyle = '#fff'; // [수정] 벽돌 깨기와 동일하게 흰색으로 변경
+            ctx.fillText(`LVL:${level}`, canvas.width - paddingX, textY);
 
 
             // --- 게임 보드 그리기 ---
-            // 보드 배경 (약간 더 어둡게)
-            ctx.fillStyle = '#000';
+            // 보드 배경
+            ctx.fillStyle = '#111';
             ctx.fillRect(boardX, boardY, COLS * tileSize, ROWS * tileSize);
 
             // 보드 테두리 그리기
-            ctx.strokeStyle = '#333';
+            ctx.strokeStyle = '#444';
             ctx.lineWidth = 2;
+            // boardY가 UI_HEIGHT보다 충분히 아래에 있어 테두리가 헤더를 침범하지 않음
             ctx.strokeRect(boardX - 2, boardY - 2, COLS * tileSize + 4, ROWS * tileSize + 4);
 
-            // 격자 그리기 (선택사항, 레트로 느낌 강화)
-            ctx.strokeStyle = '#111';
+            // 격자 그리기
+            ctx.strokeStyle = '#222';
             ctx.lineWidth = 1;
             ctx.beginPath();
             for(let x = 0; x <= COLS; x++) {
@@ -905,14 +898,17 @@
         bindBtn(btnDown, () => { if(gameRunning) playerDrop(); });
         bindBtn(btnUp, () => { if(gameRunning) playerRotate(1); }); // 상키 = 회전
         
+        // [수정] A 버튼: 회전 -> 하드 드롭 (Start 버튼 기능 이관)
         bindBtn(btnA, () => { 
-            if(gameRunning) playerRotate(1); 
+            if(gameRunning) playerHardDrop(); 
             else handleActionBtn(); // 메뉴 선택 기능 겸함
         }); 
         
+        // [수정] START(B) 버튼: 하드 드롭 기능 제거 (메뉴/시작 기능만 유지)
         bindBtn(btnB, () => { 
-            if(gameRunning) playerHardDrop();
-            else handleActionBtn(); // 메뉴 선택 기능 겸함
+            // 게임 중에는 아무 동작 안함 (기능이 A로 이동됨)
+            // 메뉴에서는 Start/Confirm 역할
+            if(!gameRunning) handleActionBtn(); 
         });
 
         // 공통 액션 (Start / Select / UI 버튼)
@@ -926,12 +922,17 @@
             }
         }
 
-        // Y 버튼 (랭킹 보기)
+        // [수정] SELECT(Y) 버튼: 랭킹 보기 + 게임 중 회전 (A 버튼 기능 이관)
         bindBtn(btnY, () => {
-            if (screenStart.classList.contains('active')) {
-                renderRankings(rankingList); showScreen(screenRanking);
-            } else if (screenRanking.classList.contains('active')) {
-                showScreen(screenStart);
+            if (gameRunning) {
+                playerRotate(1); // 게임 중에는 회전
+            } else {
+                // 메뉴에서는 랭킹 보기 (기존 로직)
+                if (screenStart.classList.contains('active')) {
+                    renderRankings(rankingList); showScreen(screenRanking);
+                } else if (screenRanking.classList.contains('active')) {
+                    showScreen(screenStart);
+                }
             }
         });
 

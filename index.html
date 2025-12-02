@@ -377,9 +377,9 @@
     <div class="modal-content">
         <span class="close-modal" id="close-modal">&times;</span>
         <h2 id="modal-title" style="color: var(--neon-green); margin-bottom: 20px;">GAME TITLE</h2>
-        <div class="insert-coin-anim">INSERT COIN...</div>
-        <p style="margin-bottom: 20px;">게임을 불러오는 중입니다...</p>
-        <div style="font-size: 3rem; color: var(--secondary-color);">
+        <div class="insert-coin-anim" id="modal-status-text">INSERT COIN...</div>
+        <p id="modal-message" style="margin-bottom: 20px;">게임을 불러오는 중입니다...</p>
+        <div id="modal-spinner" style="font-size: 3rem; color: var(--secondary-color);">
             <i class="fas fa-spinner fa-spin"></i>
         </div>
         <button class="play-btn" style="margin-top: 30px;" onclick="closeGameModal()">돌아가기</button>
@@ -407,6 +407,9 @@
     const coinDisplay = document.getElementById('coin-count');
     const modal = document.getElementById('game-modal');
     const modalTitle = document.getElementById('modal-title');
+    const modalStatusText = document.getElementById('modal-status-text');
+    const modalMessage = document.getElementById('modal-message');
+    const modalSpinner = document.getElementById('modal-spinner');
     const closeModalBtn = document.getElementById('close-modal');
 
     let coins = 10;
@@ -418,10 +421,9 @@
             const card = document.createElement('div');
             card.className = 'game-card';
             
-            // 카드 전체에 클릭 이벤트 연결 (이제 카드를 클릭하면 실행됩니다)
+            // 카드 전체에 클릭 이벤트 연결
             card.onclick = () => playGame(game.title, game.url);
 
-            // 변경점: 아이콘 클래스를 game.icon 그대로 사용하도록 수정 (${game.icon})
             card.innerHTML = `
                 <div class="game-thumbnail">
                     <i class="${game.icon}"></i>
@@ -429,7 +431,6 @@
                 <div class="game-info">
                     <div class="game-genre">${game.genre}</div>
                     <div class="game-title">${game.title}</div>
-                    <!-- 버튼의 중복 onclick 제거 (상위 카드의 이벤트가 실행됨) -->
                     <button class="play-btn">START GAME</button>
                 </div>
             `;
@@ -437,21 +438,57 @@
         });
     }
 
-    // 게임 시작 함수 (URL 파라미터 추가)
+    // 모달 상태 초기화 함수 (새로운 게임 실행 시 호출)
+    function resetModalUI() {
+        modalTitle.style.color = 'var(--neon-green)';
+        modalStatusText.innerText = "INSERT COIN...";
+        modalStatusText.style.color = "var(--neon-pink)";
+        modalMessage.innerHTML = "게임을 불러오는 중입니다...";
+        modalMessage.style.color = "#fff";
+        modalSpinner.style.display = 'block';
+    }
+
+    // 팝업 차단 안내 UI 표시 함수
+    function showPopupBlockedUI() {
+        modalTitle.innerText = "⚠️ 실행 불가";
+        modalTitle.style.color = "red";
+        
+        modalStatusText.innerText = "POPUP BLOCKED";
+        modalStatusText.style.color = "red";
+        
+        modalMessage.innerHTML = "브라우저가 팝업을 차단했습니다.<br>주소창 우측 상단에서 <strong>'팝업 허용'</strong>을 체크해주세요.";
+        modalMessage.style.color = "#ffaaaa";
+        
+        modalSpinner.style.display = 'none';
+    }
+
+    // 게임 시작 함수
     window.playGame = function(title, url) {
         if (coins > 0) {
             coins--;
             updateCoins();
+            
+            // 모달 초기화 및 표시
+            resetModalUI();
             modalTitle.innerText = title;
             modal.style.display = 'flex';
             
-            // 오디오 효과 시뮬레이션
             console.log("Coin Inserted Sound Effect");
 
-            // 1.5초 후 게임 URL 열기 (새 탭)
+            // 1.5초 후 게임 URL 열기 시도
             setTimeout(() => {
-                window.open(url, '_blank');
-                modal.style.display = 'none'; // 모달 닫기
+                const newWindow = window.open(url, '_blank');
+
+                // 팝업 차단 여부 확인
+                if (!newWindow || newWindow.closed || typeof newWindow.closed === 'undefined') {
+                    // 차단됨: 안내 메시지 표시 및 코인 반환
+                    showPopupBlockedUI();
+                    coins++; // 코인 돌려주기
+                    updateCoins();
+                } else {
+                    // 성공: 모달 닫기
+                    modal.style.display = 'none';
+                }
             }, 1500);
 
         } else {
@@ -462,7 +499,6 @@
     // 코인 업데이트 UI
     function updateCoins() {
         coinDisplay.innerText = coins;
-        // 코인이 줄어들 때 빨간색으로 깜빡임 효과
         coinDisplay.style.color = 'red';
         setTimeout(() => {
             coinDisplay.style.color = '#ffd700';
@@ -489,7 +525,7 @@
     document.addEventListener('DOMContentLoaded', () => {
         renderGames();
         
-        // 레트로 타이핑 효과 (헤더 타이틀)
+        // 레트로 타이핑 효과
         const titleText = "PIXEL ARCADE";
         const titleElement = document.querySelector('.site-title');
         let i = 0;
@@ -509,4 +545,3 @@
 
 </body>
 </html>
-

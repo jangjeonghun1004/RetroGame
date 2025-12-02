@@ -3,817 +3,569 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>장정훈 - Full Stack Developer</title>
-    <script src="https://unpkg.com/lucide@latest"></script>
+    <title>장정훈 - Windows Profile</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;700&family=Press+Start+2P&display=swap" rel="stylesheet">
+    
     <style>
-        /* Reset & Base */
-        * { box-sizing: border-box; }
-        body, html {
-            margin: 0;
-            padding: 0;
-            width: 100%;
-            height: 100%;
-            overflow: hidden;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            user-select: none;
-            -webkit-font-smoothing: none;
-        }
-
-        /* Variables for Windows 95/98 Theme */
         :root {
-            --bg-teal: #008080;
             --win-gray: #c0c0c0;
-            --win-blue-dark: #000080;
-            --win-blue-light: #1084d0;
-            --win-gray-dark: #808080;
-            --win-gray-light: #a0a0a0;
-            --win-text: #000000;
-            --border-white: #ffffff;
-            --border-gray: #808080;
-            --border-black: #000000;
+            --win-dark: #808080;
+            --win-darker: #404040;
+            --win-light: #ffffff;
+            --win-blue: #000080;
+            --win-bg: #008080;
         }
 
-        /* Desktop */
-        #desktop {
-            background-color: var(--bg-teal);
-            width: 100%;
-            height: calc(100% - 40px);
-            position: relative;
-            padding: 10px;
+        body {
+            font-family: 'Noto Sans KR', sans-serif;
+            overflow: hidden; /* Prevent body scroll */
+            background-color: var(--win-bg);
+            user-select: none; /* Desktop experience */
+        }
+
+        /* Retro 3D Borders */
+        .win-border-out {
+            border-top: 2px solid var(--win-light);
+            border-left: 2px solid var(--win-light);
+            border-right: 2px solid var(--win-darker);
+            border-bottom: 2px solid var(--win-darker);
+            box-shadow: 1px 1px 0px 0px black;
+        }
+        
+        .win-border-in {
+            border-top: 2px solid var(--win-dark);
+            border-left: 2px solid var(--win-dark);
+            border-right: 2px solid var(--win-light);
+            border-bottom: 2px solid var(--win-light);
+        }
+
+        .win-window {
+            position: absolute;
+            background-color: var(--win-gray);
+            box-shadow: 4px 4px 10px rgba(0,0,0,0.5);
             display: flex;
             flex-direction: column;
-            flex-wrap: wrap;
-            align-content: flex-start;
-            gap: 20px;
+            resize: both; /* Allow resizing if needed, but JS handles drag */
+            overflow: hidden;
+            min-width: 300px;
+            min-height: 200px;
         }
 
-        /* Icons */
+        .title-bar {
+            background: linear-gradient(90deg, var(--win-blue), #1084d0);
+            color: white;
+            padding: 2px 4px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-weight: bold;
+            font-size: 14px;
+            cursor: default;
+        }
+
         .desktop-icon {
             width: 80px;
             display: flex;
             flex-direction: column;
             align-items: center;
+            margin-bottom: 24px;
             cursor: pointer;
+            text-shadow: 1px 1px 2px black;
             color: white;
-            text-align: center;
-            font-size: 12px;
-            text-shadow: 1px 1px 0px rgba(0,0,0,0.5);
-            border: 1px solid transparent;
         }
-        .desktop-icon:hover {
-            border: 1px dotted rgba(255, 255, 255, 0.3);
-        }
-        .desktop-icon:hover .icon-img {
+
+        .desktop-icon:hover .icon-bg {
             filter: brightness(1.2);
-        }
-        .desktop-icon:active .icon-label {
-            background-color: var(--win-blue-dark);
-            border: 1px dotted white;
-        }
-        .icon-img {
-            width: 48px;
-            height: 48px;
-            margin-bottom: 5px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-        .icon-label {
-            padding: 2px 4px;
-        }
-
-        /* Window Styling */
-        .window {
-            position: absolute;
-            background-color: var(--win-gray);
-            border-top: 2px solid var(--border-white);
-            border-left: 2px solid var(--border-white);
-            border-right: 2px solid var(--border-black);
-            border-bottom: 2px solid var(--border-black);
-            box-shadow: 1px 1px 0px black;
-            display: flex;
-            flex-direction: column;
-            min-width: 300px;
-            min-height: 200px;
-            max-width: 90vw;
-            max-height: 80vh;
-            display: none; /* Hidden by default */
-        }
-
-        /* Active Window Title Bar Color */
-        .window.active .title-bar {
-            background: linear-gradient(90deg, var(--win-blue-dark), var(--win-blue-light));
-        }
-
-        /* Inactive Window Title Bar Color */
-        .window .title-bar {
-            background: linear-gradient(90deg, var(--win-gray-dark), var(--win-gray-light));
-            color: #ccc;
+            transform: scale(1.05);
         }
         
-        .window.active .title-bar-text {
-            color: white;
-        }
-
-        .title-bar {
-            padding: 3px 4px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            cursor: default;
-        }
-
-        .title-bar-text {
-            font-weight: bold;
-            font-size: 14px;
-            display: flex;
-            align-items: center;
-            gap: 5px;
-        }
-
-        .title-bar-controls {
-            display: flex;
-            gap: 2px;
-        }
-
-        .win-btn {
-            width: 16px;
-            height: 14px;
-            background-color: var(--win-gray);
-            border-top: 1px solid var(--border-white);
-            border-left: 1px solid var(--border-white);
-            border-right: 1px solid var(--border-black);
-            border-bottom: 1px solid var(--border-black);
-            font-size: 10px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            cursor: pointer;
-            font-weight: bold;
-            line-height: 1;
-            color: black;
-        }
-        .win-btn:active {
-            border-top: 1px solid var(--border-black);
-            border-left: 1px solid var(--border-black);
-            border-right: 1px solid var(--border-white);
-            border-bottom: 1px solid var(--border-white);
-        }
-
-        .window-body {
-            padding: 10px;
-            flex: 1;
-            overflow: auto;
-            font-size: 14px;
-            line-height: 1.5;
-        }
-
-        /* Content Styling inside Windows */
-        .content-section {
-            background: white;
-            border: 2px inset var(--win-gray);
-            padding: 15px;
-            height: 100%;
-            overflow-y: auto;
-            color: black;
-            user-select: text;
-        }
-
-        h2, h3, h4 { margin-top: 0; }
-        .skill-tag {
-            display: inline-block;
-            background: #eee;
-            border: 1px solid #999;
-            padding: 2px 6px;
-            margin: 2px;
-            font-size: 12px;
+        .desktop-icon p {
+            background-color: transparent;
+            padding: 2px 4px;
             border-radius: 2px;
         }
-        .exp-item {
-            margin-bottom: 15px;
-            border-bottom: 1px dashed #ccc;
-            padding-bottom: 10px;
-        }
-        .exp-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: baseline;
-            flex-wrap: wrap;
-        }
-        .exp-title { font-weight: bold; color: var(--win-blue-dark); }
-        .exp-date { font-size: 12px; color: #666; }
         
-        a { color: blue; }
-
-        /* Taskbar */
-        #taskbar {
-            height: 40px;
-            background-color: var(--win-gray);
-            border-top: 2px solid var(--border-white);
-            position: fixed;
-            bottom: 0;
-            width: 100%;
-            display: flex;
-            align-items: center;
-            padding: 2px;
-            z-index: 1000;
+        .desktop-icon.selected p {
+            background-color: var(--win-blue);
+            border: 1px dotted white;
         }
 
-        #start-btn {
-            height: 32px;
-            padding: 0 10px;
-            display: flex;
-            align-items: center;
-            gap: 5px;
-            font-weight: bold;
-            font-style: italic;
-            background-color: var(--win-gray);
-            border-top: 2px solid var(--border-white);
-            border-left: 2px solid var(--border-white);
-            border-right: 2px solid var(--border-black);
-            border-bottom: 2px solid var(--border-black);
-            box-shadow: 1px 1px 0px black;
-            cursor: pointer;
-            margin-right: 10px;
+        /* Scrollbar Retro Style */
+        ::-webkit-scrollbar {
+            width: 16px;
+            background: var(--win-gray);
         }
-        #start-btn:active, #start-btn.active {
-            border-top: 2px solid var(--border-black);
-            border-left: 2px solid var(--border-black);
-            border-right: 2px solid var(--border-white);
-            border-bottom: 2px solid var(--border-white);
-            background-color: #dcdcdc;
+        ::-webkit-scrollbar-thumb {
+            background: var(--win-gray);
+            border-top: 1px solid var(--win-light);
+            border-left: 1px solid var(--win-light);
+            border-right: 1px solid var(--win-dark);
+            border-bottom: 1px solid var(--win-dark);
+        }
+        ::-webkit-scrollbar-button {
+            background: var(--win-gray);
+            height: 16px;
+            border: 1px solid var(--win-gray);
+            box-shadow: inset 1px 1px 0 var(--win-light), inset -1px -1px 0 var(--win-dark);
         }
 
-        .taskbar-divider {
-            width: 2px;
-            height: 28px;
-            background: var(--border-gray);
-            border-right: 1px solid white;
-            margin: 0 5px;
-        }
-
-        #task-list {
-            flex: 1;
-            display: flex;
-            gap: 4px;
-            overflow-x: auto;
-        }
-
-        .task-item {
-            width: 150px;
-            height: 32px;
-            background-color: var(--win-gray);
-            border-top: 2px solid var(--border-white);
-            border-left: 2px solid var(--border-white);
-            border-right: 2px solid var(--border-black);
-            border-bottom: 2px solid var(--border-black);
-            display: flex;
-            align-items: center;
-            padding: 0 8px;
-            font-size: 12px;
-            cursor: pointer;
-            text-overflow: ellipsis;
-            white-space: nowrap;
-            overflow: hidden;
-        }
-        .task-item.active {
-            background-color: #eee;
-            border-top: 2px solid var(--border-black);
-            border-left: 2px solid var(--border-black);
-            border-right: 2px solid var(--border-white);
-            border-bottom: 2px solid var(--border-white);
-            font-weight: bold;
-        }
-
-        #clock-tray {
-            width: 80px;
-            height: 32px;
-            background-color: var(--win-gray);
-            border: 2px inset var(--win-gray);
-            border-bottom: 1px solid white; 
-            border-right: 1px solid white;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            font-size: 12px;
-            margin-left: 5px;
-        }
-
-        /* Start Menu */
-        #start-menu {
+        .start-menu {
             position: absolute;
-            bottom: 42px;
+            bottom: 32px;
             left: 2px;
-            width: 250px;
+            width: 200px;
             background-color: var(--win-gray);
-            border-top: 2px solid var(--border-white);
-            border-left: 2px solid var(--border-white);
-            border-right: 2px solid var(--border-black);
-            border-bottom: 2px solid var(--border-black);
-            box-shadow: 2px 2px 5px rgba(0,0,0,0.5);
-            display: flex;
-            display: none; /* Hidden */
-            z-index: 2000;
-        }
-        
-        .start-side-bar {
-            width: 30px;
-            background: linear-gradient(180deg, var(--win-blue-dark), var(--win-blue-light));
-            display: flex;
-            align-items: flex-end;
-            padding-bottom: 10px;
-        }
-        .start-side-text {
-            transform: rotate(-90deg);
-            color: white;
-            font-weight: bold;
-            font-size: 20px;
-            white-space: nowrap;
-            margin-bottom: 10px;
-        }
-        
-        .start-items {
-            flex: 1;
-            padding: 5px;
-        }
-        
-        .start-item {
-            padding: 8px 10px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            cursor: pointer;
-            font-size: 14px;
-        }
-        .start-item:hover {
-            background-color: var(--win-blue-dark);
-            color: white;
-        }
-        .start-divider {
-            height: 2px;
-            border-top: 1px solid var(--border-gray);
-            border-bottom: 1px solid white;
-            margin: 5px 0;
+            display: none;
+            z-index: 9999;
         }
 
+        .taskbar-item {
+            width: 160px;
+            margin-left: 4px;
+            display: flex;
+            align-items: center;
+            padding-left: 5px;
+            font-size: 12px;
+            cursor: pointer;
+            background: var(--win-gray);
+        }
+        
+        .taskbar-item.active {
+            background: #eee;
+            box-shadow: inset 1px 1px 2px black;
+        }
     </style>
 </head>
-<body>
+<body class="h-screen w-screen overflow-hidden flex flex-col">
 
     <!-- Desktop Area -->
-    <div id="desktop">
-        <!-- Icons Generated via JS -->
-    </div>
+    <div id="desktop" class="flex-1 relative p-4" onclick="deselectIcons(event)">
+        
+        <!-- Icons Container (Grid Layout to prevent overlap) -->
+        <div class="absolute top-4 left-4 flex flex-col gap-4 z-0">
+            
+            <!-- Icon 1: Profile -->
+            <div class="desktop-icon group" onclick="selectIcon(this); openWindow('win-profile')">
+                <div class="icon-bg w-12 h-12 mb-1 flex items-center justify-center text-4xl text-blue-200 drop-shadow-lg">
+                    <i class="fa-solid fa-computer"></i>
+                </div>
+                <p class="text-xs text-center">내 PC (프로필)</p>
+            </div>
 
-    <!-- Start Menu -->
-    <div id="start-menu">
-        <div class="start-side-bar">
-            <div class="start-side-text">JangOS 25</div>
+            <!-- Icon 2: Experience -->
+            <div class="desktop-icon group" onclick="selectIcon(this); openWindow('win-exp')">
+                <div class="icon-bg w-12 h-12 mb-1 flex items-center justify-center text-4xl text-yellow-400 drop-shadow-lg">
+                    <i class="fa-solid fa-folder-open"></i>
+                </div>
+                <p class="text-xs text-center">경력기술서</p>
+            </div>
+
+            <!-- Icon 3: Skills -->
+            <div class="desktop-icon group" onclick="selectIcon(this); openWindow('win-skills')">
+                <div class="icon-bg w-12 h-12 mb-1 flex items-center justify-center text-4xl text-white drop-shadow-lg">
+                    <i class="fa-solid fa-file-code"></i>
+                </div>
+                <p class="text-xs text-center">기술스택.txt</p>
+            </div>
+
+            <!-- Icon 4: Portfolio -->
+            <div class="desktop-icon group" onclick="selectIcon(this); openWindow('win-portfolio')">
+                <div class="icon-bg w-12 h-12 mb-1 flex items-center justify-center text-4xl text-blue-500 drop-shadow-lg">
+                    <i class="fa-brands fa-internet-explorer"></i>
+                </div>
+                <p class="text-xs text-center">포트폴리오</p>
+            </div>
+
+             <!-- Icon 5: Contact -->
+             <div class="desktop-icon group" onclick="selectIcon(this); openWindow('win-contact')">
+                <div class="icon-bg w-12 h-12 mb-1 flex items-center justify-center text-4xl text-green-400 drop-shadow-lg">
+                    <i class="fa-solid fa-envelope"></i>
+                </div>
+                <p class="text-xs text-center">연락처</p>
+            </div>
+
+            <!-- Icon 6: Trash -->
+            <div class="desktop-icon group mt-auto" onclick="selectIcon(this)">
+                <div class="icon-bg w-12 h-12 mb-1 flex items-center justify-center text-4xl text-gray-300 drop-shadow-lg">
+                    <i class="fa-solid fa-trash-can"></i>
+                </div>
+                <p class="text-xs text-center">휴지통</p>
+            </div>
         </div>
-        <div class="start-items">
-            <div class="start-item" onclick="openWindow('profile')">
-                <i data-lucide="user"></i> <span>프로필 정보</span>
+
+        <!-- Windows (Hidden by default, absolute positioned to not overlap icons) -->
+        
+        <!-- 1. Profile Window -->
+        <div id="win-profile" class="win-window win-border-out hidden w-[500px] h-[450px]" style="top: 5%; left: 140px;">
+            <div class="title-bar" onmousedown="startDrag(event, 'win-profile')">
+                <div class="flex items-center gap-2">
+                    <i class="fa-solid fa-computer"></i>
+                    <span>시스템 등록 정보 - 장정훈</span>
+                </div>
+                <div class="flex gap-1">
+                    <button onclick="minimizeWindow('win-profile')" class="w-5 h-5 bg-gray-300 border border-gray-600 flex items-center justify-center text-xs hover:bg-gray-400">_</button>
+                    <button onclick="closeWindow('win-profile')" class="w-5 h-5 bg-red-600 text-white border border-gray-600 flex items-center justify-center text-xs hover:bg-red-700">X</button>
+                </div>
             </div>
-            <div class="start-item" onclick="openWindow('resume')">
-                <i data-lucide="file-text"></i> <span>경력 기술서</span>
-            </div>
-            <div class="start-item" onclick="openWindow('portfolio')">
-                <i data-lucide="folder-open"></i> <span>포트폴리오</span>
-            </div>
-            <div class="start-divider"></div>
-            <div class="start-item" onclick="openWindow('contact')">
-                <i data-lucide="mail"></i> <span>이메일 보내기</span>
-            </div>
-            <div class="start-divider"></div>
-            <div class="start-item" onclick="location.reload()">
-                <i data-lucide="power"></i> <span>시스템 종료</span>
+            <div class="flex-1 bg-white p-6 overflow-y-auto">
+                <div class="flex gap-6">
+                    <div class="w-32 flex flex-col items-center">
+                        <div class="w-28 h-32 bg-gray-200 border-2 border-gray-400 flex items-center justify-center mb-2 overflow-hidden">
+                             <i class="fa-solid fa-user text-6xl text-gray-400"></i>
+                        </div>
+                        <p class="text-center font-bold">장정훈</p>
+                    </div>
+                    <div class="flex-1 space-y-3">
+                        <h2 class="text-xl font-bold border-b-2 border-gray-800 pb-1">웹 개발자 (Web Developer)</h2>
+                        <ul class="text-sm space-y-2 text-gray-800">
+                            <li><i class="fa-solid fa-cake-candles w-6"></i> 1982년생 (만 43세)</li>
+                            <li><i class="fa-solid fa-map-location-dot w-6"></i> 인천 부평구 부평4동</li>
+                            <li><i class="fa-solid fa-graduation-cap w-6"></i> 서울디지털대 소프트웨어공학</li>
+                            <li><i class="fa-solid fa-briefcase w-6"></i> 총 경력 18년 1개월</li>
+                        </ul>
+                        <div class="bg-yellow-50 border border-yellow-200 p-3 text-sm mt-4 rounded">
+                            <p class="leading-relaxed">
+                                "소프트웨어공학 전공과 다양한 실무 경험을 보유한 풀스택 웹개발 인재입니다.
+                                ASP.NET, Java, Spring Boot 등을 활용하여 안정적인 시스템을 구축해왔으며, 
+                                팀원과의 소통을 중요시합니다."
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                <div class="mt-6 border-t pt-4">
+                    <p class="font-bold mb-2">핵심 역량:</p>
+                    <div class="flex flex-wrap gap-2">
+                        <span class="px-2 py-1 bg-blue-100 text-blue-800 text-xs border border-blue-300">Full Stack</span>                        
+                        <span class="px-2 py-1 bg-blue-100 text-blue-800 text-xs border border-blue-300">ASP.NET MVC</span>
+                        <span class="px-2 py-1 bg-blue-100 text-blue-800 text-xs border border-blue-300">JAVA(Spring Boot)</span>
+                        <span class="px-2 py-1 bg-blue-100 text-blue-800 text-xs border border-blue-300">RESTful API</span>
+                        <span class="px-2 py-1 bg-blue-100 text-blue-800 text-xs border border-blue-300">NEXT.js</span>
+                        <span class="px-2 py-1 bg-blue-100 text-blue-800 text-xs border border-blue-300">React</span>
+                        <span class="px-2 py-1 bg-blue-100 text-blue-800 text-xs border border-blue-300">RDBMS</span>                        
+                        <span class="px-2 py-1 bg-blue-100 text-blue-800 text-xs border border-blue-300">프로젝트 관리</span>
+                    </div>
+                </div>
             </div>
         </div>
+
+        <!-- 2. Experience Window -->
+        <div id="win-exp" class="win-window win-border-out hidden w-[600px] h-[500px]" style="top: 10%; left: 180px;">
+            <div class="title-bar" onmousedown="startDrag(event, 'win-exp')">
+                <div class="flex items-center gap-2">
+                    <i class="fa-solid fa-folder-open"></i>
+                    <span>C:\My Documents\경력기술서.doc</span>
+                </div>
+                <div class="flex gap-1">
+                    <button onclick="minimizeWindow('win-exp')" class="w-5 h-5 bg-gray-300 border border-gray-600 flex items-center justify-center text-xs">_</button>
+                    <button onclick="closeWindow('win-exp')" class="w-5 h-5 bg-red-600 text-white border border-gray-600 flex items-center justify-center text-xs">X</button>
+                </div>
+            </div>
+            <div class="flex-1 bg-white p-0 overflow-hidden flex flex-col">
+                <!-- Toolbar Simulation -->
+                <div class="bg-[#f0f0f0] border-b border-gray-400 p-1 flex gap-2 text-sm">
+                    <button class="px-3 py-1 border border-transparent hover:border-gray-400 hover:bg-gray-200">File</button>
+                    <button class="px-3 py-1 border border-transparent hover:border-gray-400 hover:bg-gray-200">Edit</button>
+                    <button class="px-3 py-1 border border-transparent hover:border-gray-400 hover:bg-gray-200">View</button>
+                </div>
+                <div class="p-6 overflow-y-auto font-sans">
+                    <h1 class="text-2xl font-bold mb-6 text-center underline decoration-4 decoration-blue-800">경력 상세 기술서</h1>
+                    
+                    <!-- Job 1 -->
+                    <div class="mb-8 relative pl-6 border-l-2 border-gray-300">
+                        <div class="absolute -left-[9px] top-0 w-4 h-4 rounded-full bg-blue-600"></div>
+                        <h3 class="text-lg font-bold text-blue-900">한국방송통신대학교 출판문화원</h3>
+                        <p class="text-sm text-gray-600 font-mono mb-2">2025.08 ~ 2026.01 (5개월) 재직중/프리랜서</p>
+                        <p class="font-bold text-sm mb-1">담당 업무: 굿즈(Goods) 물류 운영 시스템 개발</p>
+                        <ul class="list-disc list-inside text-sm text-gray-700 ml-2 space-y-1">
+                            <li>개발 언어: Java, XPLATFORM</li>
+                            <li>데이터베이스: Oracle</li>
+                            <li>업무 역할: 기획, PM, FE(front-end), BE(back-end) 전반 수행</li>                            
+                            <li>산출물 작성(UML, UI Prototype, ERD, Class Diagram 등)</li>
+                        </ul>
+                    </div>
+
+                    <!-- Job 2 -->
+                    <div class="mb-8 relative pl-6 border-l-2 border-gray-300">
+                        <div class="absolute -left-[9px] top-0 w-4 h-4 rounded-full bg-gray-400"></div>
+                        <h3 class="text-lg font-bold text-gray-800">큐익스프레스</h3>
+                        <p class="text-sm text-gray-600 font-mono mb-2">2018.04 ~ 2024.08 (6년) 개발실/차장</p>
+                        <p class="font-bold text-sm mb-1">담당 업무: WMS 시스템 유지, 보수 및 신규 개발</p>
+                        <ul class="list-disc list-inside text-sm text-gray-700 ml-2 space-y-1">
+                            <li>개발 언어: ASP.NET MVC, Core, RESTful API</li>
+                            <li>데이터베이스: MS-SQL, MY-SQL</li>                                                        
+                            <li>Dispatch Service System(반출 서비스 시스템)</li>
+                            <li>Goods Storage Service System(제품 보관 서비스 시스템)</li>
+                            <li>Surcharge Fee System(추가 요금 시스템)</li>
+                            <li>Picking Service System(픽킹 서비스 시스템)</li>
+                            <li>Packing Service System(팩킹 서비스 시스템)</li>
+                            <li>Warehouse IN System(제품 입고 시스템)</li>
+                            <li>Warehouse Out System(제품 출고 시스템)</li>
+                            <li>WMS-Member Management System(창고 회원 관리 시스템)</li>
+                            <li>Stock Management System(재고 관리 시스템)</li>
+                        </ul>
+                    </div>
+
+                    <!-- Job 1 -->
+                    <div class="mb-8 relative pl-6 border-l-2 border-gray-300">
+                        <div class="absolute -left-[9px] top-0 w-4 h-4 rounded-full bg-gray-400"></div>
+                        <h3 class="text-lg font-bold text-gray-800">한국방송통신대학교 출판문화원</h3>
+                        <p class="text-sm text-gray-600 font-mono mb-2">2016.08 ~ 2017.01 (5개월) 전산팀/프리랜서</p>
+                        <p class="font-bold text-sm mb-1">담당 업무: 모바일 웹 사이트 리뉴얼</p>
+                        <ul class="list-disc list-inside text-sm text-gray-700 ml-2 space-y-1">
+                            <li>개발 언어: Java, JSP</li>
+                            <li>데이터베이스: Oracle</li>
+                            <li>업무 역할: FE(Front-end)</li>
+                        </ul>
+                    </div>
+
+                    <!-- Job 3 -->
+                    <div class="mb-8 relative pl-6 border-l-2 border-gray-300">
+                        <div class="absolute -left-[9px] top-0 w-4 h-4 rounded-full bg-gray-400"></div>
+                        <h3 class="text-lg font-bold text-gray-800">토토로사</h3>
+                        <p class="text-sm text-gray-600 font-mono mb-2">2013.07 ~ 2016.07 (3년 1개월) 개발1팀/대리</p>
+                        <p class="font-bold text-sm mb-1">담당 업무: 파일 공유 시스템 유지,보수 및 신규 개발</p>
+                        <ul class="list-disc list-inside text-sm text-gray-700 ml-2">
+                            <li>개발 언어: ASP.NET MVC, jQuery Mobile, ASP</li>
+                            <li>데이터베이스: MS-SQL, MY-SQL</li>
+                            <li>업무 역할: BE(Back-end)</li>
+                        </ul>
+                    </div>
+
+                    <!-- Job 4 -->
+                    <div class="mb-8 relative pl-6 border-l-2 border-gray-300">
+                        <div class="absolute -left-[9px] top-0 w-4 h-4 rounded-full bg-gray-400"></div>
+                        <h3 class="text-lg font-bold text-gray-800">텐디알</h3>
+                        <p class="text-sm text-gray-600 font-mono mb-2">2006.12 ~ 2013.06 (6년 7개월) 개발팀/웹 서비스 파트장</p>
+                        <p class="font-bold text-sm mb-1">담당 업무: 날씨 웹 서비스 유지,보수 및 신규 웹 사이트 개발</p>
+                        <ul class="list-disc list-inside text-sm text-gray-700 ml-2">
+                            <li>개발언어: ASP.NET MVC, ASP, PHP</li>
+                            <li>데이터베이스: MS-SQL, MY-SQL</li>
+                            <li>Linux/Windows 서버 운영</li>
+                        </ul>
+                    </div>
+
+                    <div class="mb-8 relative pl-6 border-l-2 border-gray-300">
+                        <div class="absolute -left-[9px] top-0 w-4 h-4 rounded-full bg-gray-400"></div>
+                        <h3 class="text-lg font-bold text-gray-800">사각</h3>
+                        <p class="text-sm text-gray-600 font-mono mb-2">2005.08 ~ 2006.08 (1년 1개월) 개발실/팀원</p>
+                        <p class="font-bold text-sm mb-1">담당 업무: 웹 사이트 개발</p>
+                        <ul class="list-disc list-inside text-sm text-gray-700 ml-2">
+                            <li>개발 언어: ASP.NET, ASP, PHP</li>
+                            <li>데이터베이스: MS-SQL, MY-SQL</li>
+                            <li>업무 역할: BE(Back-end)</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 3. Skills Window -->
+        <div id="win-skills" class="win-window win-border-out hidden w-[400px] h-[400px]" style="top: 15%; left: 220px;">
+            <div class="title-bar" onmousedown="startDrag(event, 'win-skills')">
+                <div class="flex items-center gap-2">
+                    <i class="fa-solid fa-file-code"></i>
+                    <span>기술스택.txt - 메모장</span>
+                </div>
+                <div class="flex gap-1">
+                    <button onclick="minimizeWindow('win-skills')" class="w-5 h-5 bg-gray-300 border border-gray-600 flex items-center justify-center text-xs">_</button>
+                    <button onclick="closeWindow('win-skills')" class="w-5 h-5 bg-red-600 text-white border border-gray-600 flex items-center justify-center text-xs">X</button>
+                </div>
+            </div>
+            <div class="flex-1 bg-white p-1 font-mono text-sm overflow-y-auto">
+                <pre class="whitespace-pre-wrap">
+[Backend]
+- ASP.NET (MVC, Core) : Expert
+- Java / Spring Boot  : Experienced
+
+[Frontend]
+- Javascript (ES6+)   : Expert
+- React.js / Next.js  : Experienced
+- jQuery / HTML / CSS : Expert
+- XPLATFORM           : Experienced
+
+[Database]
+- MS-SQL : Expert
+- Oracle : Experienced
+- MY-SQL : Expert
+
+[Tools & DevOps]
+- Git / GitHub
+- Windows Server / IIS
+- Linux (CentOS)
+                </pre>
+            </div>
+        </div>
+
+        <!-- 4. Portfolio Window -->
+        <div id="win-portfolio" class="win-window win-border-out hidden w-[450px] h-[350px]" style="top: 20%; left: 260px;">
+             <div class="title-bar" onmousedown="startDrag(event, 'win-portfolio')">
+                <div class="flex items-center gap-2">
+                    <i class="fa-brands fa-internet-explorer"></i>
+                    <span>Internet Explorer - Portfolio</span>
+                </div>
+                <div class="flex gap-1">
+                    <button onclick="minimizeWindow('win-portfolio')" class="w-5 h-5 bg-gray-300 border border-gray-600 flex items-center justify-center text-xs">_</button>
+                    <button onclick="closeWindow('win-portfolio')" class="w-5 h-5 bg-red-600 text-white border border-gray-600 flex items-center justify-center text-xs">X</button>
+                </div>
+            </div>
+             <div class="flex-1 bg-[#e0e0e0] flex flex-col overflow-hidden">
+                <!-- Address Bar -->
+                <div class="bg-[#f0f0f0] p-1 border-b border-gray-400 flex items-center gap-2 text-xs">
+                    <span>Address:</span>
+                    <div class="flex-1 bg-white border border-gray-400 px-1 py-0.5">http://jangjeonghun.portfolio.com</div>
+                    <button class="px-2 bg-gray-200 border border-gray-400">Go</button>
+                </div>
+                
+                <div class="flex-1 bg-white p-4 overflow-y-auto">
+                    <h3 class="font-bold mb-4 text-blue-600 hover:underline cursor-pointer">즐겨찾기 링크</h3>
+                    
+                    <div class="grid grid-cols-1 gap-3">
+                        <a href="https://jangjeonghun.tistory.com/" target="_blank" class="flex items-center p-2 border hover:bg-blue-50 group">
+                            <i class="fa-solid fa-blog text-orange-500 text-xl mr-3"></i>
+                            <div>
+                                <div class="font-bold text-sm group-hover:underline text-blue-700">기술 블로그 (Tistory)</div>
+                                <div class="text-xs text-gray-500">https://jangjeonghun.tistory.com/</div>
+                            </div>
+                        </a>
+
+                        <a href="https://jangjeonghun1004.github.io/RetroGame" target="_blank" class="flex items-center p-2 border hover:bg-blue-50 group">
+                            <i class="fa-brands fa-github text-black text-xl mr-3"></i>
+                            <div>
+                                <div class="font-bold text-sm group-hover:underline text-blue-700">Retro Game</div>
+                                <div class="text-xs text-gray-500">https://jangjeonghun1004.github.io/RetroGame</div>
+                            </div>
+                        </a>
+
+                        <a href="https://docs.google.com/document/d/1i1_HClZH5o3qXN1bTYpQ_jkkMEC2w64NNL6Qd-eoPuM/edit?usp=sharing" target="_blank" class="flex items-center p-2 border hover:bg-blue-50 group">
+                            <i class="fa-solid fa-cloud text-green-500 text-xl mr-3"></i>
+                            <div>
+                                <div class="font-bold text-sm group-hover:underline text-blue-700">산출물</div>
+                                <div class="text-xs text-gray-500">UML</div>
+                            </div>
+                        </a>
+                        <a href="https://docs.google.com/spreadsheets/d/17PloXG5cYznLCXL8B75ncVQ_0FX1jbn4rngH6bfshDo/edit?usp=sharing" target="_blank" class="flex items-center p-2 border hover:bg-blue-50 group">
+                            <i class="fa-solid fa-cloud text-green-500 text-xl mr-3"></i>
+                            <div>
+                                <div class="font-bold text-sm group-hover:underline text-blue-700">산출물</div>
+                                <div class="text-xs text-gray-500">프로젝트 관리</div>
+                            </div>
+                        </a>
+                        <a href="https://drive.google.com/file/d/1qLbDG7XCUz5m2ivEa5JpnM-pQNRXHK32/view?usp=sharing" target="_blank" class="flex items-center p-2 border hover:bg-blue-50 group">
+                            <i class="fa-solid fa-cloud text-green-500 text-xl mr-3"></i>
+                            <div>
+                                <div class="font-bold text-sm group-hover:underline text-blue-700">산출물</div>
+                                <div class="text-xs text-gray-500">Class Diagram</div>
+                            </div>
+                        </a>
+                        <a href="https://drive.google.com/file/d/1FnhqiJJza5YOmm1S_IRMfaeADIEjk7VK/view?usp=sharing" target="_blank" class="flex items-center p-2 border hover:bg-blue-50 group">
+                            <i class="fa-solid fa-cloud text-green-500 text-xl mr-3"></i>
+                            <div>
+                                <div class="font-bold text-sm group-hover:underline text-blue-700">산출물</div>
+                                <div class="text-xs text-gray-500">ERD</div>
+                            </div>
+                        </a>                        
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 5. Contact Window -->
+        <div id="win-contact" class="win-window win-border-out hidden w-[350px] h-[250px]" style="top: 25%; left: 300px;">
+            <div class="title-bar" onmousedown="startDrag(event, 'win-contact')">
+               <div class="flex items-center gap-2">
+                   <i class="fa-solid fa-envelope"></i>
+                   <span>Outlook Express - Contact</span>
+               </div>
+               <div class="flex gap-1">
+                   <button onclick="minimizeWindow('win-contact')" class="w-5 h-5 bg-gray-300 border border-gray-600 flex items-center justify-center text-xs">_</button>
+                   <button onclick="closeWindow('win-contact')" class="w-5 h-5 bg-red-600 text-white border border-gray-600 flex items-center justify-center text-xs">X</button>
+               </div>
+           </div>
+           <div class="flex-1 bg-white p-4">
+                <div class="border-b pb-2 mb-2">
+                    <p class="text-xs text-gray-500">To:</p>
+                    <p class="font-bold">jangjeonghun1004@gmail.com</p>
+                </div>
+                <div class="space-y-4">
+                    <div class="flex items-center gap-3">
+                        <div class="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center text-green-600">
+                            <i class="fa-solid fa-phone"></i>
+                        </div>
+                        <div>
+                            <p class="text-xs text-gray-500">Mobile</p>
+                            <p class="font-mono font-bold text-sm">010-2750-1476</p>
+                        </div>
+                    </div>
+                    
+                    <div class="text-center mt-6">
+                        <button class="px-4 py-1 bg-gray-200 border-2 border-b-gray-600 border-r-gray-600 border-t-white border-l-white active:border-t-gray-600 active:border-l-gray-600 active:bg-gray-300 text-sm">
+                            <i class="fa-solid fa-paper-plane mr-1"></i> 메일 보내기
+                        </button>
+                    </div>
+                </div>
+           </div>
+       </div>
+
     </div>
 
     <!-- Taskbar -->
-    <div id="taskbar">
-        <div id="start-btn" onclick="toggleStartMenu()">
-            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/e/e2/Windows_logo_and_wordmark_-_1995-2001.svg/512px-Windows_logo_and_wordmark_-_1995-2001.svg.png" width="18" alt="win">
-            Start
+    <div class="h-10 bg-[#c0c0c0] border-t-2 border-white flex items-center px-1 relative z-50 shadow-lg">
+        <!-- Start Button -->
+        <div class="relative">
+            <button onclick="toggleStartMenu()" class="flex items-center gap-1 px-2 py-1 bg-[#c0c0c0] border-2 border-b-black border-r-black border-t-white border-l-white active:border-t-black active:border-l-black hover:bg-gray-300 font-bold text-sm mr-2 shadow-sm">
+                <i class="fa-brands fa-windows text-lg"></i>
+                Start
+            </button>
+            
+            <!-- Start Menu Popup -->
+            <div id="start-menu" class="start-menu win-border-out flex">
+                <div class="w-8 bg-blue-900 text-white flex items-end justify-center py-2 relative">
+                   <span class="transform -rotate-90 origin-bottom font-bold whitespace-nowrap text-lg tracking-widest absolute bottom-4 left-1/2 -translate-x-1/2">WINDOWS 98</span>
+                </div>
+                <div class="flex-1 py-1">
+                    <div class="hover:bg-blue-800 hover:text-white px-3 py-2 cursor-pointer flex items-center gap-2 text-sm">
+                        <i class="fa-solid fa-computer w-4 text-center"></i> 내 정보
+                    </div>
+                    <div class="hover:bg-blue-800 hover:text-white px-3 py-2 cursor-pointer flex items-center gap-2 text-sm">
+                        <i class="fa-solid fa-folder-open w-4 text-center"></i> 경력
+                    </div>
+                    <div class="border-t border-gray-400 my-1"></div>
+                    <div class="hover:bg-blue-800 hover:text-white px-3 py-2 cursor-pointer flex items-center gap-2 text-sm" onclick="location.reload()">
+                        <i class="fa-solid fa-power-off w-4 text-center"></i> 시스템 종료
+                    </div>
+                </div>
+            </div>
         </div>
-        <div class="taskbar-divider"></div>
-        <div id="task-list">
-            <!-- Active Windows Tasks -->
+
+        <div class="border-l border-gray-500 h-6 mx-1"></div>
+        <div class="border-r border-white h-6 mx-1"></div>
+
+        <!-- Open Windows List -->
+        <div id="taskbar-list" class="flex-1 flex overflow-hidden">
+            <!-- Items injected via JS -->
         </div>
-        <div class="taskbar-divider"></div>
-        <div id="clock-tray">12:00 PM</div>
+
+        <!-- Clock -->
+        <div class="ml-auto w-24 h-7 bg-[#c0c0c0] border-2 border-t-gray-500 border-l-gray-500 border-b-white border-r-white flex items-center justify-center text-xs px-2 shadow-inner">
+            <i class="fa-solid fa-volume-high mr-2 text-xs"></i>
+            <span id="clock">12:00 PM</span>
+        </div>
     </div>
 
     <script>
-        // Init Lucide Icons
-        
-        // Data derived from resume
-        const resumeData = {
-            profile: {
-                name: "장정훈",
-                title: "풀스택 웹 개발자 (18년차)",
-                birth: "1982년 (만 43세)",
-                education: "서울디지털대 소프트웨어공학과 졸업 (2014.08)",
-                intro: `소프트웨어공학전공과 다양한 실무 경험을 보유한 웹개발 인재입니다.<br>
-                ASP.NET MVC, Spring Boot, React, Next.js 등 폭넓은 기술 스택을 보유하고 있습니다.<br>
-                팀 내에서 긍정적인 협업 분위기를 만들고, 프로젝트의 성공적인 완수를 이끌어냅니다.`
-            },
-            skills: [
-                { cat: "Backend", items: ["Java", "ASP.NET MVC", "ASP.NET Core", "Spring Boot", "Node.js"] },
-                { cat: "Frontend", items: ["React", "Next.js", "JavaScript", "jQuery", "XPLATFORM"] },
-                { cat: "Database", items: ["Oracle", "MS-SQL", "MySQL"] },
-                { cat: "Tools", items: ["Git", "Restful API"] }
-            ],
-            experience: [
-                {
-                    company: "한국방송통신대학교출판문화원",
-                    period: "2025.08 ~ 현재",
-                    role: "전산팀 프리랜서",
-                    desc: "Java, XPLATFORM, Oracle 기반 시스템 개발 및 유지보수"
-                },
-                {
-                    company: "큐익스프레스",
-                    period: "2018.04 ~ 2024.08 (6년 5개월)",
-                    role: "개발실 차장",
-                    desc: "WMS(물류 관리 시스템) 신규 개발 및 유지보수. ASP.NET MVC/Core, MS-SQL 환경. 반입/반출, 재고관리, 픽킹/팩킹 시스템 구축."
-                },
-                {
-                    company: "한국방송통신대학교출판문화원",
-                    period: "2016.08 ~ 2017.01",
-                    role: "Mobile 시스템 리뉴얼",
-                    desc: "Java JSP 활용 Front-end 개발 담당"
-                },
-                {
-                    company: "토토로사",
-                    period: "2013.07 ~ 2016.07",
-                    role: "개발1팀 / SM",
-                    desc: "ASP.NET MVC, jQuery 활용 웹 서비스 유지보수"
-                },
-                {
-                    company: "텐디알",
-                    period: "2006.12 ~ 2013.06",
-                    role: "웹서비스 파트장",
-                    desc: "ASP.NET, Linux/Windows Server 관리, 웹 개발"
-                }
-            ],
-            contact: {
-                phone: "010-2750-1476",
-                email: "jangjeonghun1004@gmail.com",
-                blog: "https://jangjeonghun.tistory.com/",
-                address: "인천 부평구 부평4동"
-            },
-            portfolio: [
-                { title: "GitHub 프로필", url: "https://jangjeonghun1004.github.io/profile" },
-                { title: "Next.js 프로젝트", url: "https://next-pairing-book.vercel.app/" },
-                { title: "React 프로젝트", url: "https://jangjeonghun1004.github.io/React-Project1/" },
-                { title: "일정 관리 앱", url: "https://schedule-note.vercel.app/" }
-            ]
-        };
-
-        // Window Management
+        // State
         let zIndexCounter = 100;
-        const openWindows = [];
+        let activeWindowId = null;
+        let draggedElement = null;
+        let shiftX = 0;
+        let shiftY = 0;
 
-        function renderDesktopIcons() {
-            const icons = [
-                { id: 'profile', icon: 'computer', label: '내 컴퓨터<br>(내 정보)', color: '#000080' },
-                { id: 'resume', icon: 'file-text', label: '이력서.txt', color: '#fff' },
-                { id: 'portfolio', icon: 'globe', label: '인터넷<br>(포트폴리오)', color: '#1084d0' },
-                { id: 'contact', icon: 'mail', label: '아웃룩<br>(연락처)', color: '#ffd700' },
-                { id: 'skills', icon: 'layers', label: '기술 스택', color: '#ff00ff' }
-            ];
-
-            const desktop = document.getElementById('desktop');
-            desktop.innerHTML = ''; // Clear existing icons to prevent duplication on re-render
-
-            icons.forEach(ic => {
-                const el = document.createElement('div');
-                el.className = 'desktop-icon';
-                el.innerHTML = `
-                    <div class="icon-img" style="color:${ic.color}"><i data-lucide="${ic.icon}" width="32" height="32"></i></div>
-                    <div class="icon-label">${ic.label}</div>
-                `;
-                
-                // Changed from ondblclick to onclick for better usability across all devices
-                el.onclick = () => openWindow(ic.id); 
-                
-                desktop.appendChild(el);
-            });
-            
-            // Safety check for Lucide
-            if (typeof lucide !== 'undefined') {
-                lucide.createIcons();
-            }
-        }
-
-        function getContent(id) {
-            if (id === 'profile') {
-                return `
-                    <div class="content-section" style="text-align:center;">
-                        <i data-lucide="user-circle" width="64" height="64" style="margin: 10px auto; color: #000080;"></i>
-                        <h2>${resumeData.profile.name}</h2>
-                        <p><strong>${resumeData.profile.title}</strong></p>
-                        <hr>
-                        <p style="text-align:left; font-size:13px; line-height:1.6;">
-                            <b>생년월일:</b> ${resumeData.profile.birth}<br>
-                            <b>학력:</b> ${resumeData.profile.education}<br>
-                            <b>주소:</b> ${resumeData.contact.address}<br>
-                        </p>
-                        <div style="background:#ffffe0; padding:10px; border:1px solid #999; text-align:left; margin-top:10px;">
-                            ${resumeData.profile.intro}
-                        </div>
-                    </div>
-                `;
-            } else if (id === 'resume') {
-                let html = `<div class="content-section" style="font-family: 'Courier New', monospace;">`;
-                html += `<h3>[ 경력 기술서 ]</h3><br>`;
-                resumeData.experience.forEach(exp => {
-                    html += `
-                        <div class="exp-item">
-                            <div class="exp-header">
-                                <span class="exp-title">■ ${exp.company}</span>
-                                <span class="exp-date">${exp.period}</span>
-                            </div>
-                            <div style="margin-top:5px; color:#444;"><b>Role:</b> ${exp.role}</div>
-                            <div style="margin-top:5px; padding-left:10px; border-left: 2px solid #ddd;">${exp.desc}</div>
-                        </div>
-                    `;
-                });
-                html += `</div>`;
-                return html;
-            } else if (id === 'portfolio') {
-                let html = `<div class="content-section"><h3>즐겨찾기 (Links)</h3><ul>`;
-                resumeData.portfolio.forEach(p => {
-                    html += `<li><a href="${p.url}" target="_blank">🔗 ${p.title}</a> <br><small style="color:#666">${p.url}</small></li><br>`;
-                });
-                html += `<li><a href="${resumeData.contact.blog}" target="_blank">📝 기술 블로그 (Tistory)</a></li>`;
-                html += `</ul>
-                <div style="text-align:center; margin-top:20px; border:1px solid gray; padding:10px; background:#eee;">
-                    <p>외부 링크는 새 탭에서 열립니다.</p>
-                </div>
-                </div>`;
-                return html;
-            } else if (id === 'contact') {
-                return `
-                    <div class="content-section">
-                        <h3>Contact Info</h3>
-                        <div style="display:flex; flex-direction:column; gap:10px;">
-                            <div>
-                                <label>Phone:</label>
-                                <input type="text" value="${resumeData.contact.phone}" readonly style="width:100%">
-                            </div>
-                            <div>
-                                <label>Email:</label>
-                                <input type="text" value="${resumeData.contact.email}" readonly style="width:100%">
-                            </div>
-                            <div style="margin-top:20px; border-top:1px solid #ccc; padding-top:10px;">
-                                <p>장정훈님에게 메일을 보내시겠습니까?</p>
-                                <a href="mailto:${resumeData.contact.email}">
-                                    <button style="padding:5px 15px; cursor:pointer;">Outlook 열기 (Mailto)</button>
-                                </a>
-                            </div>
-                        </div>
-                    </div>
-                `;
-            } else if (id === 'skills') {
-                let html = `<div class="content-section">`;
-                resumeData.skills.forEach(cat => {
-                    html += `<h4>📂 ${cat.cat}</h4><div style="margin-bottom:15px;">`;
-                    cat.items.forEach(skill => {
-                        html += `<span class="skill-tag">${skill}</span>`;
-                    });
-                    html += `</div>`;
-                });
-                html += `</div>`;
-                return html;
-            }
-        }
-
-        function getTitle(id) {
-            const titles = {
-                profile: '시스템 정보 - 장정훈',
-                resume: '이력서.txt - 메모장',
-                portfolio: 'Microsoft Internet Explorer',
-                contact: '새 메시지',
-                skills: 'C:\\Skills'
-            };
-            return titles[id] || '새 창';
-        }
-
-        function openWindow(id) {
-            // Close start menu
-            document.getElementById('start-menu').style.display = 'none';
-            document.getElementById('start-btn').classList.remove('active');
-
-            // Bring to front if already open
-            const existingWin = document.getElementById(`win-${id}`);
-            if (existingWin) {
-                if(existingWin.style.display === 'none') {
-                    existingWin.style.display = 'flex';
-                    updateTaskbar(id, true);
-                }
-                bringToFront(existingWin);
-                return;
-            }
-
-            // Create new window
-            const win = document.createElement('div');
-            win.className = 'window active';
-            win.id = `win-${id}`;
-            win.style.display = 'flex'; // Explicitly show the window
-            
-            // --- Center Calculation Logic Changed ---
-            const desktop = document.getElementById('desktop');
-            const viewportWidth = desktop.offsetWidth;
-            const viewportHeight = desktop.offsetHeight;
-            
-            // Estimate window size (based on min-width/height in CSS + buffer)
-            const estWidth = 350; 
-            const estHeight = 300;
-
-            // Calculate center position
-            // Add a small offset based on how many windows are open to create a stacking effect
-            const stackOffset = (openWindows.length * 25) % 150; 
-            
-            let leftPos = (viewportWidth / 2) - (estWidth / 2) + stackOffset;
-            let topPos = (viewportHeight / 2) - (estHeight / 2) + stackOffset;
-
-            // Prevent off-screen placement on very small screens
-            if (leftPos < 0) leftPos = 10;
-            if (topPos < 0) topPos = 10;
-            
-            win.style.left = leftPos + 'px';
-            win.style.top = topPos + 'px';
-            win.style.zIndex = ++zIndexCounter;
-            // ----------------------------------------
-
-            win.innerHTML = `
-                <div class="title-bar" onmousedown="startDrag(event, '${win.id}')">
-                    <div class="title-bar-text">
-                        <i data-lucide="${getIconForId(id)}" width="14" style="margin-right:5px"></i>
-                        ${getTitle(id)}
-                    </div>
-                    <div class="title-bar-controls">
-                        <div class="win-btn" onclick="minimizeWindow('${id}')">_</div>
-                        <div class="win-btn" onclick="closeWindow('${id}')">X</div>
-                    </div>
-                </div>
-                <div class="window-body">
-                    ${getContent(id)}
-                </div>
-            `;
-            
-            // Add interaction
-            win.onmousedown = () => bringToFront(win);
-
-            document.body.appendChild(win);
-            openWindows.push(id);
-            
-            if (typeof lucide !== 'undefined') {
-                lucide.createIcons();
-            }
-            
-            // Deactivate other windows visually
-            document.querySelectorAll('.window').forEach(w => w.classList.remove('active'));
-            win.classList.add('active');
-
-            // Add to taskbar
-            addTaskbarItem(id);
-        }
-
-        function getIconForId(id) {
-            if(id === 'profile') return 'user';
-            if(id === 'resume') return 'file-text';
-            if(id === 'portfolio') return 'globe';
-            if(id === 'contact') return 'mail';
-            return 'folder';
-        }
-
-        function closeWindow(id) {
-            const win = document.getElementById(`win-${id}`);
-            if (win) win.remove();
-            
-            const index = openWindows.indexOf(id);
-            if (index > -1) openWindows.splice(index, 1);
-            
-            removeTaskbarItem(id);
-        }
-
-        function minimizeWindow(id) {
-            const win = document.getElementById(`win-${id}`);
-            if (win) win.style.display = 'none';
-            updateTaskbar(id, false);
-        }
-
-        function bringToFront(win) {
-            win.style.zIndex = ++zIndexCounter;
-            
-            // Update active visual state
-            document.querySelectorAll('.window').forEach(w => w.classList.remove('active'));
-            win.classList.add('active');
-            
-            // Update active state visuals in taskbar
-            const id = win.id.replace('win-', '');
-            updateTaskbar(id, true);
-        }
-
-        // Taskbar Logic
-        function addTaskbarItem(id) {
-            const list = document.getElementById('task-list');
-            const item = document.createElement('div');
-            item.className = 'task-item active';
-            item.id = `task-${id}`;
-            item.innerText = getTitle(id);
-            item.onclick = () => {
-                const win = document.getElementById(`win-${id}`);
-                if (win.style.display === 'none') {
-                    win.style.display = 'flex';
-                    bringToFront(win);
-                } else {
-                    // Check if it's top most
-                    if(parseInt(win.style.zIndex) === zIndexCounter && win.classList.contains('active')) {
-                        minimizeWindow(id);
-                    } else {
-                        bringToFront(win);
-                    }
-                }
-            };
-            list.appendChild(item);
-            updateTaskbar(id, true);
-        }
-
-        function removeTaskbarItem(id) {
-            const item = document.getElementById(`task-${id}`);
-            if (item) item.remove();
-        }
-
-        function updateTaskbar(activeId, isOpen) {
-            document.querySelectorAll('.task-item').forEach(el => {
-                el.classList.remove('active');
-            });
-            if (isOpen) {
-                const activeItem = document.getElementById(`task-${activeId}`);
-                if (activeItem) activeItem.classList.add('active');
-            }
-        }
-
-        // Drag Logic
-        let isDragging = false;
-        let currentDragWin = null;
-        let dragOffsetX = 0;
-        let dragOffsetY = 0;
-
-        function startDrag(e, winId) {
-            if(e.target.classList.contains('win-btn')) return; // Don't drag if clicking buttons
-            
-            isDragging = true;
-            currentDragWin = document.getElementById(winId);
-            const rect = currentDragWin.getBoundingClientRect();
-            dragOffsetX = e.clientX - rect.left;
-            dragOffsetY = e.clientY - rect.top;
-            
-            bringToFront(currentDragWin);
-        }
-
-        document.addEventListener('mousemove', (e) => {
-            if (!isDragging || !currentDragWin) return;
-            e.preventDefault();
-            
-            let newX = e.clientX - dragOffsetX;
-            let newY = e.clientY - dragOffsetY;
-            
-            // Boundaries (Rough)
-            newY = Math.max(0, newY); // Don't go above top
-            newY = Math.min(window.innerHeight - 40 - 30, newY); // Don't go below taskbar
-
-            currentDragWin.style.left = newX + 'px';
-            currentDragWin.style.top = newY + 'px';
-        });
-
-        document.addEventListener('mouseup', () => {
-            isDragging = false;
-            currentDragWin = null;
-        });
-
-        // Start Menu Logic
-        function toggleStartMenu() {
-            const menu = document.getElementById('start-menu');
-            const btn = document.getElementById('start-btn');
-            
-            if (menu.style.display === 'flex') {
-                menu.style.display = 'none';
-                btn.classList.remove('active');
-            } else {
-                menu.style.display = 'flex';
-                btn.classList.add('active');
-                if (typeof lucide !== 'undefined') {
-                    lucide.createIcons();
-                }
-            }
-        }
-
-        // Clock
+        // Clock Function
         function updateClock() {
             const now = new Date();
             let hours = now.getHours();
@@ -821,25 +573,138 @@
             hours = hours % 12;
             hours = hours ? hours : 12; 
             const minutes = now.getMinutes().toString().padStart(2, '0');
-            document.getElementById('clock-tray').innerText = `${hours}:${minutes} ${ampm}`;
+            document.getElementById('clock').innerText = `${hours}:${minutes} ${ampm}`;
         }
         setInterval(updateClock, 1000);
         updateClock();
 
-        // Close start menu when clicking desktop
-        document.getElementById('desktop').addEventListener('mousedown', (e) => {
-             if(e.target === document.getElementById('desktop')) {
-                 document.getElementById('start-menu').style.display = 'none';
-                 document.getElementById('start-btn').classList.remove('active');
-             }
-        });
+        // Icon Selection
+        function selectIcon(el) {
+            deselectIcons();
+            el.classList.add('selected');
+        }
 
-        // Initialize
-        // Wait slightly to ensure lucide script is ready
-        window.onload = function() {
-            renderDesktopIcons();
-            // Auto open profile on load after 500ms for effect
-            setTimeout(() => openWindow('profile'), 500);
+        function deselectIcons(e) {
+            if (e && e.target.closest('.desktop-icon')) return;
+            document.querySelectorAll('.desktop-icon').forEach(el => el.classList.remove('selected'));
+            document.getElementById('start-menu').style.display = 'none';
+        }
+
+        // Window Management
+        function openWindow(id) {
+            const win = document.getElementById(id);
+            if (win.classList.contains('hidden')) {
+                win.classList.remove('hidden');
+                // Ensure unique initial positioning if multiple opened same time
+                addTaskbarItem(id);
+            }
+            bringToFront(id);
+        }
+
+        function closeWindow(id) {
+            document.getElementById(id).classList.add('hidden');
+            removeTaskbarItem(id);
+        }
+
+        function minimizeWindow(id) {
+            document.getElementById(id).classList.add('hidden');
+            const taskItem = document.querySelector(`.taskbar-item[data-id="${id}"]`);
+            if (taskItem) taskItem.classList.remove('active', 'win-border-in');
+        }
+
+        function bringToFront(id) {
+            zIndexCounter++;
+            const win = document.getElementById(id);
+            win.style.zIndex = zIndexCounter;
+            win.classList.remove('hidden');
+            activeWindowId = id;
+            
+            // Update Taskbar visual
+            document.querySelectorAll('.taskbar-item').forEach(item => {
+                item.classList.remove('active', 'win-border-in');
+                item.classList.add('win-border-out');
+            });
+            const activeTask = document.querySelector(`.taskbar-item[data-id="${id}"]`);
+            if (activeTask) {
+                activeTask.classList.add('active', 'win-border-in');
+                activeTask.classList.remove('win-border-out');
+            }
+        }
+
+        // Taskbar Management
+        function addTaskbarItem(id) {
+            const list = document.getElementById('taskbar-list');
+            if (document.querySelector(`.taskbar-item[data-id="${id}"]`)) return;
+
+            const win = document.getElementById(id);
+            const title = win.querySelector('.title-bar span').innerText;
+            const iconClass = win.querySelector('.title-bar i').className;
+
+            const btn = document.createElement('div');
+            btn.className = 'taskbar-item win-border-out';
+            btn.dataset.id = id;
+            btn.innerHTML = `<i class="${iconClass} mr-2"></i> <span class="truncate">${title}</span>`;
+            
+            btn.onclick = () => {
+                if (win.classList.contains('hidden') || activeWindowId !== id) {
+                    bringToFront(id);
+                } else {
+                    minimizeWindow(id);
+                }
+            };
+
+            list.appendChild(btn);
+        }
+
+        function removeTaskbarItem(id) {
+            const item = document.querySelector(`.taskbar-item[data-id="${id}"]`);
+            if (item) item.remove();
+        }
+
+        function toggleStartMenu() {
+            const menu = document.getElementById('start-menu');
+            menu.style.display = menu.style.display === 'flex' ? 'none' : 'flex';
+        }
+
+        // Drag Functionality
+        function startDrag(e, id) {
+            e.preventDefault();
+            bringToFront(id);
+            draggedElement = document.getElementById(id);
+            
+            // Get click position relative to the element
+            const rect = draggedElement.getBoundingClientRect();
+            shiftX = e.clientX - rect.left;
+            shiftY = e.clientY - rect.top;
+
+            document.addEventListener('mousemove', onMouseMove);
+            document.addEventListener('mouseup', onMouseUp);
+        }
+
+        function onMouseMove(e) {
+            if (!draggedElement) return;
+
+            let newLeft = e.clientX - shiftX;
+            let newTop = e.clientY - shiftY;
+
+            // Simple boundary check (optional)
+            if (newTop < 0) newTop = 0;
+            
+            draggedElement.style.left = newLeft + 'px';
+            draggedElement.style.top = newTop + 'px';
+        }
+
+        function onMouseUp() {
+            document.removeEventListener('mousemove', onMouseMove);
+            document.removeEventListener('mouseup', onMouseUp);
+            draggedElement = null;
+        }
+
+        // Initialize: Open Profile window on load with delay
+        window.onload = () => {
+            setTimeout(() => {
+                openWindow('win-profile');
+            }, 500);
         };
 
     </script>

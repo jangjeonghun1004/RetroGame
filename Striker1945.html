@@ -4,41 +4,31 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>Retro 1945 Striker</title>
-    <!-- 구글 폰트 -->
     <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@500;700&display=swap" rel="stylesheet">
     <style>
-        /* 기본 스타일 (유지) */
         * { margin: 0; padding: 0; box-sizing: border-box; user-select: none; -webkit-user-select: none; -webkit-tap-highlight-color: transparent; }
         body { background-color: #222; color: #0f0; font-family: 'Press Start 2P', cursive; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; height: 100dvh; overflow: hidden; padding-top: env(safe-area-inset-top); padding-bottom: env(safe-area-inset-bottom); }
         
-        /* 콘솔 본체 (색상 유지) */
         .console-body { 
-            background-color: #4a5a6a; 
-            width: 100%; max-width: 420px; height: calc(100dvh - 10px); max-height: 850px; 
-            border-radius: 15px; padding: 10px; padding-bottom: 5px; 
-            display: flex; flex-direction: column; 
-            box-shadow: 0 0 0 2px #2a3a4a, 0 10px 20px rgba(0,0,0,0.5), inset 0 -5px 10px rgba(0,0,0,0.1); 
-            position: relative; 
+            background-color: #4a5a6a; width: 100%; max-width: 420px; height: calc(100dvh - 10px); max-height: 850px; 
+            border-radius: 15px; padding: 10px; padding-bottom: 5px; display: flex; flex-direction: column; 
+            box-shadow: 0 0 0 2px #2a3a4a, 0 10px 20px rgba(0,0,0,0.5), inset 0 -5px 10px rgba(0,0,0,0.1); position: relative; 
         }
         
-        /* 화면 영역 */
         .screen-bezel { background-color: #111; border-radius: 8px; padding: 8px; flex: 1; min-height: 40%; display: flex; align-items: center; justify-content: center; box-shadow: inset 0 0 15px rgba(0,0,0,0.8); margin-bottom: 8px; position: relative; overflow: hidden; }
         #game-container { position: relative; width: 100%; height: 100%; background-color: #000; border: 2px solid #333; overflow: hidden; border-radius: 4px; }
         canvas { display: block; width: 100%; height: 100%; background-color: #000020; }
         
-        /* 스캔라인 & UI 레이어 */
         .scanlines { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(to bottom, rgba(255,255,255,0), rgba(255,255,255,0) 50%, rgba(0,0,0,0.1) 50%, rgba(0,0,0,0.1)); background-size: 100% 4px; pointer-events: none; z-index: 10; }
         #ui-layer { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 20; pointer-events: auto; overflow: hidden; }
         .screen-ui { position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: none; flex-direction: column; align-items: center; justify-content: center; background: rgba(0, 0, 0, 0.85); text-align: center; padding: 10px; }
         .screen-ui.active { display: flex; }
         
-        /* 텍스트 스타일 */
         h1 { font-size: 16px; margin-bottom: 10px; color: #ff4040; text-shadow: 2px 2px #fff; line-height: 1.4; }
         h2 { font-size: 10px; color: #ff0; margin-bottom: 8px; }
         p { font-size: 9px; color: #fff; margin-bottom: 6px; line-height: 1.4; }
         
-        /* 통계 및 버튼 */
         .stats-container { display: flex; justify-content: center; gap: 8px; margin-bottom: 12px; width: 100%; }
         .stat-item { background-color: rgba(20, 0, 0, 0.6); border: 1px solid #f00; padding: 6px; width: 85px; }
         .stat-label { display: block; color: #aaa; font-size: 6px; margin-bottom: 3px; }
@@ -50,7 +40,14 @@
         button.blink { animation: blink 1s infinite; }
         @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
 
-        /* 랭킹 리스트 */
+        /* 상점 스타일 */
+        .shop-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; width: 90%; margin-bottom: 10px; }
+        .shop-item { border: 1px solid #0f0; padding: 5px; text-align: center; cursor: pointer; transition: background 0.1s; }
+        .shop-item:hover, .shop-item:active { background: rgba(0, 255, 0, 0.2); }
+        .shop-item h3 { font-size: 8px; color: #ff0; margin-bottom: 4px; }
+        .shop-item span { font-size: 7px; color: #0ff; display: block; }
+        .shop-money { font-size: 12px; color: #0f0; margin-bottom: 10px; text-shadow: 1px 1px #000; }
+
         .ranking-list-container { width: 95%; margin-bottom: 10px; font-size: 8px; line-height: 1.6; }
         .rank-row { display: flex; justify-content: space-between; border-bottom: 1px dashed #333; padding: 3px 0; align-items: center; }
         .rank-rank { color: #ff0; width: 45px; text-align: left; font-size: 11px; text-shadow: 1px 1px #000; }
@@ -58,7 +55,6 @@
         .rank-score { color: #fff; text-align: right; font-size: 9px; width: 55px; }
         input#initials-input { background: transparent; border: none; border-bottom: 2px solid #f00; color: #ff0; font-family: 'Press Start 2P', cursive; font-size: 18px; width: 90px; text-align: center; margin: 12px 0; text-transform: uppercase; outline: none; }
 
-        /* --- 컨트롤러 영역 --- */
         .controls-area { flex: 0 0 auto; display: grid; grid-template-columns: 1fr 1fr; align-items: center; gap: 2px; padding: 5px 2px; max-height: 40vh; }
         .d-pad-container { position: relative; width: 140px; height: 140px; justify-self: center; align-self: center; }
         .d-pad { position: relative; width: 100%; height: 100%; }
@@ -73,17 +69,16 @@
         .btn-left { top: 30px; left: -15px; width: 75px; height: 80px; }
         .btn-right { top: 30px; right: -15px; width: 75px; height: 80px; }
 
-        /* 액션 버튼 수정 */
         .action-buttons { position: relative; width: 120px; height: 120px; justify-self: center; align-self: center; transform: rotate(-15deg); }
         .abxy-btn { position: absolute; width: 34px; height: 34px; border-radius: 50%; background: #333; color: rgba(255,255,255,0.9); display: flex; align-items: center; justify-content: center; font-family: 'Roboto', sans-serif; font-weight: bold; font-size: 14px; box-shadow: 0 3px 0 #111, 0 5px 5px rgba(0,0,0,0.3); cursor: pointer; transition: transform 0.1s, box-shadow 0.1s; }
         .abxy-btn:active, .abxy-btn.active { transform: translateY(3px); box-shadow: 0 0 0 #111, inset 0 2px 5px rgba(0,0,0,0.5); }
         
-        /* 버튼 개별 색상 및 위치 */
-        .btn-x { top: 5px; left: 43px; background-color: #0055cc; box-shadow: 0 3px 0 #003366, 0 5px 5px rgba(0,0,0,0.3); font-size: 10px; } /* BOMB (Blue) */
-        .btn-y { top: 43px; left: 5px; color: #40ff40; background-color: #333; box-shadow: 0 3px 0 #111; font-size: 10px; } /* SEL (Green text) */
-        .btn-b { top: 43px; right: 5px; background-color: #ffd040; color: #333; box-shadow: 0 3px 0 #b09000; font-size: 9px; } /* AUTO (Yellow) */
-        .btn-a { bottom: 5px; left: 43px; background-color: #cc0000; box-shadow: 0 3px 0 #800000; } /* FIRE (Red) */
+        .btn-x { top: 5px; left: 43px; background-color: #0055cc; box-shadow: 0 3px 0 #003366, 0 5px 5px rgba(0,0,0,0.3); font-size: 10px; } 
+        .btn-y { top: 43px; left: 5px; color: #40ff40; background-color: #333; box-shadow: 0 3px 0 #111; font-size: 10px; } 
+        .btn-b { top: 43px; right: 5px; background-color: #ffd040; color: #333; box-shadow: 0 3px 0 #b09000; font-size: 9px; } 
+        .btn-a { bottom: 5px; left: 43px; background-color: #cc0000; box-shadow: 0 3px 0 #800000; } 
 
+        @keyframes warningBlink { 0% { opacity: 0; color: #f00; } 50% { opacity: 1; color: #ff0; } 100% { opacity: 0; color: #f00; } }
     </style>
 </head>
 <body>
@@ -104,8 +99,9 @@
                                 <span id="start-highscore" class="stat-value highlight">0</span>
                             </div>
                         </div>
-                        <p style="color:#888; margin-top:10px;">MISSION: DESTROY ALL ENEMIES</p>
-                        <p style="color:#0af; font-size: 8px; margin-top:5px;">[X]: BOMB / [B]: AUTO FIRE</p>
+                        <p style="color:#888; margin-top:10px;">MISSION: DESTROY THE BOSS</p>
+                        <p style="color:#0af; font-size: 8px; margin-top:5px;">[X]: BOMB / [SPACE]: AUTO FIRE</p>
+                        <p style="color:#ff0; font-size: 7px;">GET COINS & VISIT SHOP!</p>
                         <button id="start-btn" class="blink">INSERT COIN</button>
                         <button id="view-ranking-btn" style="margin-top:5px; border:none; font-size:10px; color:#888;">RANKING</button>
                     </div>
@@ -114,17 +110,52 @@
                     <div id="screen-gameover" class="screen-ui">
                         <h1 style="color:#fff;">MISSION<br>FAILED</h1>
                         <p>SCORE: <span id="go-score" class="highlight">0</span></p>
-                        
                         <div style="margin: 8px 0; width: 90%;">
                             <h2 style="font-size: 8px; color: #888; margin-bottom: 6px; letter-spacing: 2px;">- ACES -</h2>
                             <div id="gameover-ranking-list" class="ranking-list-container" style="width: 100%;"></div>
                         </div>
-
                         <button id="retry-btn">RETRY</button>
                         <button id="go-home-btn" style="margin-top:5px; border:none; font-size:10px; color:#888;">MENU</button>
                     </div>
 
-                    <!-- 신기록(이니셜 입력) 화면 -->
+                    <!-- 상점 화면 -->
+                    <div id="screen-shop" class="screen-ui">
+                        <h1 style="color:#0f0;">ITEM SHOP</h1>
+                        <p>CREDIT: <span id="shop-money" class="highlight">$0</span></p>
+                        <div class="shop-grid">
+                            <div class="shop-item" onclick="buyItem('wide')">
+                                <h3>WIDE</h3>
+                                <span id="price-wide">$500</span>
+                            </div>
+                            <div class="shop-item" onclick="buyItem('heavy')">
+                                <h3>HEAVY</h3>
+                                <span id="price-heavy">$500</span>
+                            </div>
+                            <div class="shop-item" onclick="buyItem('power')">
+                                <h3>POWER UP</h3>
+                                <span id="price-power">$800</span>
+                            </div>
+                            <!-- 꼬마 비행기 (Wingman) 아이템 추가 -->
+                            <div class="shop-item" onclick="buyItem('wingman')">
+                                <h3>WINGMAN</h3>
+                                <span id="price-wingman">$1000</span>
+                            </div>
+                            <div class="shop-item" onclick="buyItem('bomb')">
+                                <h3>BOMB</h3>
+                                <span id="price-bomb">$300</span>
+                            </div>
+                            <div class="shop-item" onclick="buyItem('repair')">
+                                <h3>REPAIR</h3>
+                                <span id="price-repair">$400</span>
+                            </div>
+                            <div class="shop-item" onclick="closeShop()" style="grid-column: span 2; background: #333;">
+                                <h3 style="color:#fff;">NEXT STAGE >></h3>
+                            </div>
+                        </div>
+                        <p id="shop-msg" style="color:#ff0; height:10px;"></p>
+                    </div>
+
+                    <!-- 신기록 화면 -->
                     <div id="screen-newrecord" class="screen-ui">
                         <h1 class="highlight">NEW ACE!</h1>
                         <p>ENTER INITIALS</p>
@@ -133,7 +164,7 @@
                         <button id="submit-score-btn">OK</button>
                     </div>
 
-                    <!-- 전체 랭킹 화면 -->
+                    <!-- 랭킹 화면 -->
                     <div id="screen-ranking" class="screen-ui">
                         <h2>HALL OF FAME</h2>
                         <div id="ranking-list" class="ranking-list-container"></div>
@@ -152,7 +183,6 @@
                 </div>
             </div>
             <div class="action-buttons">
-                <!-- X: Bomb, Y: Sel, B: Auto, A: Fire -->
                 <div class="abxy-btn btn-x" id="btn-x">BOMB</div>
                 <div class="abxy-btn btn-y" id="btn-y">SEL</div>
                 <div class="abxy-btn btn-b" id="btn-b">AUTO</div>
@@ -171,15 +201,17 @@
         const screenGameOver = document.getElementById('screen-gameover');
         const screenNewRecord = document.getElementById('screen-newrecord');
         const screenRanking = document.getElementById('screen-ranking');
-        const allScreens = [screenStart, screenGameOver, screenNewRecord, screenRanking];
+        const screenShop = document.getElementById('screen-shop');
+        const allScreens = [screenStart, screenGameOver, screenNewRecord, screenRanking, screenShop];
 
         const startHighScoreDisplay = document.getElementById('start-highscore');
         const goScoreDisplay = document.getElementById('go-score');
         const nrRankDisplay = document.getElementById('nr-rank');
         const initialsInput = document.getElementById('initials-input');
-        
         const rankingList = document.getElementById('ranking-list');
         const gameoverRankingList = document.getElementById('gameover-ranking-list');
+        const shopMoneyDisplay = document.getElementById('shop-money');
+        const shopMsg = document.getElementById('shop-msg');
 
         // Buttons
         const startBtn = document.getElementById('start-btn');
@@ -189,19 +221,10 @@
         const submitScoreBtn = document.getElementById('submit-score-btn');
         const backBtn = document.getElementById('back-btn');
 
-        // 스토리지 키
-        const STORAGE_KEYS = {
-            HIGH_SCORE: 'striker1945_highScore',
-            RANKINGS: 'striker1945_rankings',
-        };
-
+        const STORAGE_KEYS = { HIGH_SCORE: 'striker1945_highScore', RANKINGS: 'striker1945_rankings' };
         let highScore = parseInt(localStorage.getItem(STORAGE_KEYS.HIGH_SCORE)) || 0;
         let rankings = JSON.parse(localStorage.getItem(STORAGE_KEYS.RANKINGS)) || [
-            { name: 'ACE', score: 10000 },
-            { name: 'TOP', score: 8000 },
-            { name: 'SKY', score: 5000 },
-            { name: 'JET', score: 3000 },
-            { name: 'FLY', score: 1000 }
+            { name: 'ACE', score: 10000 }, { name: 'TOP', score: 8000 }, { name: 'SKY', score: 5000 }, { name: 'JET', score: 3000 }, { name: 'FLY', score: 1000 }
         ];
 
         startHighScoreDisplay.innerText = highScore;
@@ -217,11 +240,7 @@
             rankings.slice(0, 5).forEach((item, index) => {
                 const div = document.createElement('div');
                 div.className = 'rank-row';
-                div.innerHTML = `
-                    <span class="rank-rank">${index + 1}.</span>
-                    <span class="rank-name">${item.name}</span>
-                    <span class="rank-score">${item.score}</span>
-                `;
+                div.innerHTML = `<span class="rank-rank">${index + 1}.</span><span class="rank-name">${item.name}</span><span class="rank-score">${item.score}</span>`;
                 container.appendChild(div);
             });
         }
@@ -233,9 +252,6 @@
         window.addEventListener('load', () => { resizeCanvas(); window.focus(); });
         window.addEventListener('resize', resizeCanvas);
 
-        /**
-         * 오디오 시스템
-         */
         const AudioContext = window.AudioContext || window.webkitAudioContext;
         let audioCtx;
 
@@ -253,134 +269,228 @@
             const now = audioCtx.currentTime;
 
             if (type === 'shoot') {
-                osc.type = 'square';
-                osc.frequency.setValueAtTime(800, now);
-                osc.frequency.exponentialRampToValueAtTime(100, now + 0.1);
-                gain.gain.setValueAtTime(0.1, now);
-                gain.gain.exponentialRampToValueAtTime(0.01, now + 0.1);
+                osc.type = 'square'; osc.frequency.setValueAtTime(800, now); osc.frequency.exponentialRampToValueAtTime(100, now + 0.1);
+                gain.gain.setValueAtTime(0.1, now); gain.gain.exponentialRampToValueAtTime(0.01, now + 0.1);
                 osc.start(now); osc.stop(now + 0.1);
+            } else if (type === 'heavy') {
+                osc.type = 'sawtooth'; osc.frequency.setValueAtTime(150, now); osc.frequency.linearRampToValueAtTime(50, now + 0.2);
+                gain.gain.setValueAtTime(0.15, now); gain.gain.linearRampToValueAtTime(0, now + 0.2);
+                osc.start(now); osc.stop(now + 0.2);
             } else if (type === 'explosion') {
-                osc.type = 'sawtooth';
-                osc.frequency.setValueAtTime(100, now);
-                osc.frequency.exponentialRampToValueAtTime(10, now + 0.3);
-                gain.gain.setValueAtTime(0.2, now);
-                gain.gain.exponentialRampToValueAtTime(0.01, now + 0.3);
+                osc.type = 'sawtooth'; osc.frequency.setValueAtTime(100, now); osc.frequency.exponentialRampToValueAtTime(10, now + 0.3);
+                gain.gain.setValueAtTime(0.2, now); gain.gain.exponentialRampToValueAtTime(0.01, now + 0.3);
                 osc.start(now); osc.stop(now + 0.3);
             } else if (type === 'start') {
-                osc.type = 'triangle';
-                osc.frequency.setValueAtTime(440, now);
-                osc.frequency.linearRampToValueAtTime(880, now + 0.1);
-                gain.gain.setValueAtTime(0.1, now);
-                gain.gain.linearRampToValueAtTime(0, now + 0.5);
+                osc.type = 'triangle'; osc.frequency.setValueAtTime(440, now); osc.frequency.linearRampToValueAtTime(880, now + 0.1);
+                gain.gain.setValueAtTime(0.1, now); gain.gain.linearRampToValueAtTime(0, now + 0.5);
                 osc.start(now); osc.stop(now + 0.5);
             } else if (type === 'powerup') {
-                osc.type = 'sine';
-                osc.frequency.setValueAtTime(400, now);
-                osc.frequency.linearRampToValueAtTime(1200, now + 0.2);
-                gain.gain.setValueAtTime(0.1, now);
-                gain.gain.linearRampToValueAtTime(0, now + 0.2);
+                osc.type = 'sine'; osc.frequency.setValueAtTime(400, now); osc.frequency.linearRampToValueAtTime(1200, now + 0.2);
+                gain.gain.setValueAtTime(0.1, now); gain.gain.linearRampToValueAtTime(0, now + 0.2);
                 osc.start(now); osc.stop(now + 0.2);
             } else if (type === 'bomb') {
-                osc.type = 'sawtooth';
-                osc.frequency.setValueAtTime(100, now);
-                osc.frequency.exponentialRampToValueAtTime(10, now + 1.5);
-                gain.gain.setValueAtTime(0.5, now);
-                gain.gain.exponentialRampToValueAtTime(0.01, now + 1.5);
+                osc.type = 'sawtooth'; osc.frequency.setValueAtTime(100, now); osc.frequency.exponentialRampToValueAtTime(10, now + 1.5);
+                gain.gain.setValueAtTime(0.5, now); gain.gain.exponentialRampToValueAtTime(0.01, now + 1.5);
                 osc.start(now); osc.stop(now + 1.5);
+            } else if (type === 'warning') {
+                osc.type = 'square'; osc.frequency.setValueAtTime(200, now); osc.frequency.setValueAtTime(400, now + 0.2);
+                gain.gain.setValueAtTime(0.2, now); gain.gain.setValueAtTime(0, now + 0.4);
+                osc.start(now); osc.stop(now + 0.4);
+            } else if (type === 'coin') {
+                osc.type = 'sine'; osc.frequency.setValueAtTime(1200, now); osc.frequency.exponentialRampToValueAtTime(1800, now + 0.1);
+                gain.gain.setValueAtTime(0.1, now); gain.gain.linearRampToValueAtTime(0, now + 0.1);
+                osc.start(now); osc.stop(now + 0.1);
+            } else if (type === 'shop') {
+                osc.type = 'triangle'; osc.frequency.setValueAtTime(600, now); osc.frequency.linearRampToValueAtTime(800, now + 0.2);
+                gain.gain.setValueAtTime(0.1, now); gain.gain.linearRampToValueAtTime(0, now + 0.3);
+                osc.start(now); osc.stop(now + 0.3);
             }
         }
 
-        /**
-         * 게임 로직
-         */
-        const keys = {
-            ArrowUp: false, ArrowDown: false, ArrowLeft: false, ArrowRight: false,
-            w: false, s: false, a: false, d: false,
-            Space: false, z: false, x: false
-        };
+        const keys = { ArrowUp: false, ArrowDown: false, ArrowLeft: false, ArrowRight: false, w: false, s: false, a: false, d: false, Space: false, z: false, x: false };
 
         let gameRunning = false;
         let animationId;
         let frameCount = 0;
         let score = 0;
         let gameLevel = 1;
-        
-        // 자동 발사 상태
+        let nextBossScore = 2000; 
         let isAutoFire = false;
 
-        // 게임 객체들
         const player = { 
             x: 0, y: 0, w: 24, h: 24, speed: 4, 
-            hp: 1, invulnerable: 0,
-            power: 1, 
-            bombs: 2
+            hp: 3, maxHp: 3, 
+            invulnerable: 0, power: 1, bombs: 2, weaponType: 0, 
+            money: 0,
+            leftWingman: false, rightWingman: false // 윙맨 상태 개별 관리
         };
+        
+        // 아이템 가격 관리
+        let itemPrices = {
+            wide: 500,
+            heavy: 500,
+            power: 800,
+            bomb: 300,
+            repair: 400,
+            wingman: 1000
+        };
+
         let bullets = [];
+        let enemyBullets = []; 
         let enemies = [];
         let particles = [];
         let stars = [];
         let items = [];
+        let floatingTexts = [];
+        
+        let boss = null;
+        let warningTimer = 0;
+        let isBossActive = false;
+
+        // 상점 함수들
+        function openShop() {
+            gameRunning = false;
+            cancelAnimationFrame(animationId);
+            playSound('shop');
+            // 상점 입장 시 필드 클리어
+            enemies = [];
+            enemyBullets = [];
+            bullets = [];
+            updateShopUI();
+            shopMsg.innerText = "WELCOME!";
+            showScreen(screenShop);
+        }
+
+        function closeShop() {
+            showScreen(null);
+            gameRunning = true;
+            update();
+        }
+
+        function updateShopUI() {
+            shopMoneyDisplay.innerText = `$${player.money}`;
+            document.getElementById('price-wide').innerText = `$${itemPrices.wide}`;
+            document.getElementById('price-heavy').innerText = `$${itemPrices.heavy}`;
+            document.getElementById('price-power').innerText = `$${itemPrices.power}`;
+            document.getElementById('price-bomb').innerText = `$${itemPrices.bomb}`;
+            document.getElementById('price-repair').innerText = `$${itemPrices.repair}`;
+            document.getElementById('price-wingman').innerText = `$${itemPrices.wingman}`;
+        }
+
+        window.buyItem = function(type) {
+            let cost = itemPrices[type];
+            let success = false;
+
+            if (player.money >= cost) {
+                if (type === 'wide') {
+                    if(player.weaponType !== 1) { player.weaponType = 1; player.power = 1; success = true; shopMsg.innerText = "EQUIPPED WIDE SHOT!"; }
+                    else { shopMsg.innerText = "ALREADY EQUIPPED!"; return; }
+                }
+                else if (type === 'heavy') {
+                    if(player.weaponType !== 2) { player.weaponType = 2; player.power = 1; success = true; shopMsg.innerText = "EQUIPPED HEAVY SHOT!"; }
+                    else { shopMsg.innerText = "ALREADY EQUIPPED!"; return; }
+                }
+                else if (type === 'power') {
+                    if(player.power < 3) { player.power++; success = true; shopMsg.innerText = "POWER UP!"; }
+                    else { shopMsg.innerText = "MAX POWER!"; return; }
+                }
+                else if (type === 'bomb') {
+                    if(player.bombs < 5) { player.bombs++; success = true; shopMsg.innerText = "BOMB PURCHASED!"; }
+                    else { shopMsg.innerText = "MAX BOMBS!"; return; }
+                }
+                else if (type === 'repair') {
+                    if(player.hp < player.maxHp) { player.hp++; success = true; shopMsg.innerText = "REPAIRED!"; }
+                    else { shopMsg.innerText = "FULL ENERGY!"; return; }
+                }
+                else if (type === 'wingman') {
+                    // 빈 윙맨 슬롯 구매
+                    if (!player.leftWingman || !player.rightWingman) {
+                        if(!player.leftWingman) player.leftWingman = true;
+                        else player.rightWingman = true;
+                        success = true; shopMsg.innerText = "WINGMAN SUPPORT!";
+                    } else { 
+                        shopMsg.innerText = "MAX WINGMEN!"; return; 
+                    }
+                }
+
+                if (success) {
+                    player.money -= cost;
+                    // 물가 상승
+                    if (type === 'power') itemPrices[type] = Math.ceil(itemPrices[type] * 1.5);
+                    else if (type === 'wingman') itemPrices[type] = Math.ceil(itemPrices[type] * 1.5);
+                    else itemPrices[type] = Math.ceil(itemPrices[type] * 1.2);
+                    
+                    playSound('powerup');
+                    updateShopUI();
+                }
+            } else {
+                shopMsg.innerText = "NOT ENOUGH MONEY!";
+                playSound('warning'); 
+            }
+        };
+        window.closeShop = closeShop; 
 
         function initStars() {
             stars = [];
-            for(let i=0; i<50; i++) {
-                stars.push({
-                    x: Math.random() * canvas.width,
-                    y: Math.random() * canvas.height,
-                    size: Math.random() * 2,
-                    speed: Math.random() * 3 + 1
-                });
-            }
+            for(let i=0; i<50; i++) stars.push({ x: Math.random() * canvas.width, y: Math.random() * canvas.height, size: Math.random() * 2, speed: Math.random() * 3 + 1 });
         }
 
         function spawnEnemy() {
-            const types = ['normal', 'fast', 'tank'];
-            const type = types[Math.floor(Math.random() * Math.min(types.length, 1 + gameLevel/3))];
-            
-            let enemy = {
-                x: Math.random() * (canvas.width - 20),
-                y: -30,
-                w: 20, h: 20,
-                hp: 1,
-                speed: 2,
-                color: '#f00',
-                type: 'normal',
-                score: 100
-            };
+            if (isBossActive || warningTimer > 0) return; 
 
-            if (type === 'fast') {
-                enemy.speed = 4; enemy.color = '#ff0'; enemy.w = 15; enemy.h = 15; enemy.score = 200;
-            } else if (type === 'tank') {
-                enemy.speed = 1; enemy.hp = 3; enemy.w = 30; enemy.h = 30; enemy.color = '#0f0'; enemy.score = 300;
-            }
+            const types = ['normal', 'fast', 'tank', 'sine'];
+            const type = types[Math.floor(Math.random() * Math.min(types.length, 1 + gameLevel/2))];
+            
+            let enemy = { x: Math.random() * (canvas.width - 20), y: -30, w: 20, h: 20, hp: 1, speed: 2, color: '#f00', type: type, score: 100, money: 10, tick: 0 };
+
+            if (type === 'fast') { enemy.speed = 4; enemy.color = '#ff0'; enemy.w = 15; enemy.h = 15; enemy.score = 200; enemy.money = 20; } 
+            else if (type === 'tank') { enemy.speed = 1; enemy.hp = 3; enemy.w = 30; enemy.h = 30; enemy.color = '#0f0'; enemy.score = 300; enemy.money = 50; }
+            else if (type === 'sine') { enemy.speed = 2; enemy.hp = 2; enemy.color = '#f0f'; enemy.score = 150; enemy.money = 30; }
 
             enemies.push(enemy);
         }
 
-        function spawnItem(x, y) {
-            if (Math.random() > 0.2) return;
-            const type = Math.random() < 0.8 ? 'power' : 'bomb';
+        function spawnBoss() {
+            isBossActive = true;
+            const bossType = (gameLevel - 1) % 3; 
             
-            items.push({
-                x: x, y: y,
-                w: 15, h: 15,
-                type: type,
-                vy: 1.5,
-                color: type === 'power' ? '#f0f' : '#00f'
-            });
+            let baseHp = 200 + Math.floor(score / 25);
+            let maxHp = baseHp;
+
+            let width = 80;
+            let height = 60;
+            let color = '#f00';
+            
+            if (bossType === 0) { maxHp *= 1.2; width = 100; height = 70; color = '#0f0'; } 
+            else if (bossType === 2) { maxHp *= 0.8; width = 70; height = 50; color = '#44f'; }
+
+            boss = {
+                x: canvas.width / 2 - width/2, y: -100, w: width, h: height,
+                hp: maxHp, maxHp: maxHp,
+                state: 'enter', dir: 1, tick: 0, type: bossType, color: color,
+                money: 1000 
+            };
+        }
+
+        function spawnItem(x, y) {
+            if (Math.random() > 0.25) return; 
+            const rand = Math.random();
+            let type = 'coin'; 
+            let color = '#ff0';
+
+            if (rand < 0.6) { type = 'coin'; color = '#ff0'; }
+            else if (rand < 0.8) { type = 'bomb'; color = '#00f'; }
+            else { type = 'shop'; color = '#0ff'; }
+
+            items.push({ x: x, y: y, w: 15, h: 15, type: type, vy: 1.5, color: color });
+        }
+
+        function showFloatingText(text, x, y, color) {
+            floatingTexts.push({ text: text, x: x, y: y, color: color, life: 60, vy: -0.5 });
         }
 
         function createExplosion(x, y, color, sizeMultiplier = 1) {
-            for(let i=0; i<8 * sizeMultiplier; i++) {
-                particles.push({
-                    x: x, y: y,
-                    vx: (Math.random() - 0.5) * 8 * sizeMultiplier,
-                    vy: (Math.random() - 0.5) * 8 * sizeMultiplier,
-                    life: 1.0,
-                    color: color,
-                    size: (Math.random() * 4 + 2) * sizeMultiplier
-                });
-            }
+            for(let i=0; i<8 * sizeMultiplier; i++) particles.push({ x: x, y: y, vx: (Math.random() - 0.5) * 8 * sizeMultiplier, vy: (Math.random() - 0.5) * 8 * sizeMultiplier, life: 1.0, color: color, size: (Math.random() * 4 + 2) * sizeMultiplier });
         }
 
         function useBomb() {
@@ -388,381 +498,501 @@
             player.bombs--;
             playSound('bomb');
             createExplosion(canvas.width/2, canvas.height/2, '#fff', 5);
-            enemies.forEach(e => {
-                createExplosion(e.x + e.w/2, e.y + e.h/2, e.color);
-                score += e.score;
+            
+            enemies.forEach(e => { 
+                createExplosion(e.x + e.w/2, e.y + e.h/2, e.color); 
+                score += e.score; 
+                player.money += e.money; 
             });
             enemies = [];
-            bullets = bullets.filter(b => b.isPlayer);
+            enemyBullets = [];
+
+            if (boss && isBossActive) {
+                boss.hp -= 50; 
+                createExplosion(boss.x + boss.w/2, boss.y + boss.h/2, '#fff', 2);
+                if(boss.hp <= 0) destroyBoss();
+            }
+
             player.invulnerable = 60;
         }
 
+        function destroyBoss() {
+            createExplosion(boss.x + boss.w/2, boss.y + boss.h/2, boss.color, 5);
+            score += 5000;
+            player.money += boss.money;
+            showFloatingText(`+$${boss.money}`, boss.x, boss.y, '#0f0');
+            boss = null;
+            isBossActive = false;
+            gameLevel++; 
+            
+            nextBossScore = score + 4000;
+
+            playSound('explosion');
+            
+            // 보스 처치 후 상점 입장 (1초 후)
+            setTimeout(() => {
+                if (gameRunning || !isBossActive) openShop();
+            }, 1000);
+        }
+
+        function bossShoot(b) {
+            const centerX = b.x + b.w/2;
+            const centerY = b.y + b.h;
+            
+            if (b.type === 1) { // RED
+                if (b.tick % 60 === 0) {
+                     const angle = Math.atan2(player.y - centerY, player.x - centerX);
+                     enemyBullets.push({ x: centerX, y: centerY, w: 8, h: 8, vx: Math.cos(angle)*4, vy: Math.sin(angle)*4, color: '#f55' });
+                     enemyBullets.push({ x: centerX, y: centerY, w: 8, h: 8, vx: Math.cos(angle - 0.2)*4, vy: Math.sin(angle - 0.2)*4, color: '#f55' });
+                     enemyBullets.push({ x: centerX, y: centerY, w: 8, h: 8, vx: Math.cos(angle + 0.2)*4, vy: Math.sin(angle + 0.2)*4, color: '#f55' });
+                }
+                if (b.tick % 150 === 0) {
+                     for(let k=0; k<12; k++) {
+                         enemyBullets.push({ x: centerX, y: b.y + b.h/2, w: 6, h: 6, vx: Math.cos(k * Math.PI/6)*3, vy: Math.sin(k * Math.PI/6)*3, color: '#f00' });
+                     }
+                }
+            } else if (b.type === 0) { // GREEN
+                if (b.tick % 12 === 0) {
+                    const angle = (b.tick * 0.1); 
+                    enemyBullets.push({ x: centerX, y: centerY, w: 10, h: 10, vx: Math.cos(angle)*3, vy: Math.sin(angle)*3, color: '#0f0' });
+                    enemyBullets.push({ x: centerX, y: centerY, w: 10, h: 10, vx: Math.cos(angle + Math.PI)*3, vy: Math.sin(angle + Math.PI)*3, color: '#0f0' });
+                }
+            } else if (b.type === 2) { // BLUE
+                if (b.tick % 40 === 0) {
+                    for(let k=-2; k<=2; k++) {
+                        enemyBullets.push({ x: centerX + (k*10), y: centerY, w: 6, h: 12, vx: k, vy: 6, color: '#aaf' });
+                    }
+                }
+            }
+        }
+
+        function enemyShoot(e) {
+            const angle = Math.atan2(player.y - e.y, player.x - e.x);
+            const speed = 3;
+            enemyBullets.push({
+                x: e.x + e.w/2, y: e.y + e.h, w: 6, h: 6,
+                vx: Math.cos(angle) * speed, vy: Math.sin(angle) * speed,
+                color: '#fa0' 
+            });
+        }
+
         function startGame() {
-            initAudio();
-            playSound('start');
-            showScreen(null);
+            initAudio(); playSound('start'); showScreen(null);
+            score = 0; gameLevel = 1; frameCount = 0; gameRunning = true; isAutoFire = false;
+            nextBossScore = 2000; 
+            player.x = canvas.width / 2 - player.w / 2; player.y = canvas.height - player.h - 50;
+            player.hp = 3; player.maxHp = 3; player.invulnerable = 60; player.power = 1; player.bombs = 2; player.weaponType = 0; 
+            player.money = 0; 
+            player.leftWingman = false; player.rightWingman = false; // 윙맨 초기화
+            // 가격 초기화
+            itemPrices = { wide: 500, heavy: 500, power: 800, bomb: 300, repair: 400, wingman: 1000 };
             
-            score = 0;
-            gameLevel = 1;
-            frameCount = 0;
-            gameRunning = true;
-            isAutoFire = false; // 시작 시 자동 발사 끔
-            
-            player.x = canvas.width / 2 - player.w / 2;
-            player.y = canvas.height - player.h - 50;
-            player.hp = 1;
-            player.invulnerable = 60;
-            player.power = 1; 
-            player.bombs = 2; 
-            
-            bullets = [];
-            enemies = [];
-            particles = [];
-            items = [];
-            initStars();
-            
-            resizeCanvas();
-            update();
+            bullets = []; enemyBullets = []; enemies = []; particles = []; items = []; floatingTexts = [];
+            boss = null; isBossActive = false; warningTimer = 0;
+            initStars(); resizeCanvas(); update();
         }
 
         function update() {
             if (!gameRunning) return;
             
-            // 1. 플레이어 이동
             let dx = 0; let dy = 0;
-            if (keys.ArrowLeft || keys.a) dx = -1;
-            if (keys.ArrowRight || keys.d) dx = 1;
-            if (keys.ArrowUp || keys.w) dy = -1;
-            if (keys.ArrowDown || keys.s) dy = 1;
+            if (keys.ArrowLeft || keys.a) dx = -1; if (keys.ArrowRight || keys.d) dx = 1;
+            if (keys.ArrowUp || keys.w) dy = -1; if (keys.ArrowDown || keys.s) dy = 1;
+            if (dx !== 0 || dy !== 0) { const length = Math.sqrt(dx*dx + dy*dy); dx /= length; dy /= length; player.x += dx * player.speed; player.y += dy * player.speed; }
+            player.x = Math.max(0, Math.min(canvas.width - player.w, player.x)); player.y = Math.max(0, Math.min(canvas.height - player.h, player.y));
 
-            if (dx !== 0 || dy !== 0) {
-                const length = Math.sqrt(dx*dx + dy*dy);
-                dx /= length; dy /= length;
-                player.x += dx * player.speed;
-                player.y += dy * player.speed;
-            }
+            if (frameCount % 10 === 0) { if (keys.Space || keys.z || isAutoFire) shootBullet(); }
 
-            player.x = Math.max(0, Math.min(canvas.width - player.w, player.x));
-            player.y = Math.max(0, Math.min(canvas.height - player.h, player.y));
+            stars.forEach(star => { star.y += star.speed; if(star.y > canvas.height) { star.y = 0; star.x = Math.random() * canvas.width; } });
 
-            // 플레이어 발사 (자동 연사 모드 또는 키 입력)
-            if (frameCount % 10 === 0) {
-                if (keys.Space || keys.z || isAutoFire) {
-                    shootBullet();
+            if (!isBossActive && warningTimer === 0) {
+                if (score >= nextBossScore && !boss) {
+                    warningTimer = 180; playSound('warning'); nextBossScore += 3000; 
+                } else {
+                    if (frameCount % Math.max(30, 70 - gameLevel * 5) === 0) spawnEnemy();
                 }
             }
 
-            // 2. 배경 별 이동
-            stars.forEach(star => {
-                star.y += star.speed;
-                if(star.y > canvas.height) { star.y = 0; star.x = Math.random() * canvas.width; }
-            });
+            if (warningTimer > 0) {
+                warningTimer--;
+                if (warningTimer === 0) spawnBoss();
+                if (warningTimer % 60 === 0) playSound('warning');
+            }
 
-            // 3. 적 생성
-            if (frameCount % Math.max(20, 60 - gameLevel * 2) === 0) spawnEnemy();
-            if (frameCount % 500 === 0) gameLevel++;
+            if (frameCount % 500 === 0 && !isBossActive) gameLevel++;
 
-            // 4. 총알 처리
+            // 아군 총알 처리
             for (let i = bullets.length - 1; i >= 0; i--) {
-                let b = bullets[i];
-                b.y += b.vy; b.x += b.vx || 0; 
-                
+                let b = bullets[i]; b.y += b.vy; b.x += b.vx || 0;
                 if (b.y < -10 || b.y > canvas.height + 10) { bullets.splice(i, 1); continue; }
 
                 if (b.isPlayer) {
+                    let hit = false;
+                    const damage = b.damage || 1; 
+
                     for (let j = enemies.length - 1; j >= 0; j--) {
                         let e = enemies[j];
                         if (b.x < e.x + e.w && b.x + b.w > e.x && b.y < e.y + e.h && b.y + b.h > e.y) {
-                            e.hp--;
-                            bullets.splice(i, 1);
+                            e.hp -= damage; 
+                            bullets.splice(i, 1); hit = true;
                             if (e.hp <= 0) {
-                                createExplosion(e.x + e.w/2, e.y + e.h/2, e.color);
+                                createExplosion(e.x + e.w/2, e.y + e.h/2, e.color); 
                                 spawnItem(e.x, e.y); 
-                                playSound('explosion');
-                                score += e.score;
+                                playSound('coin'); 
+                                score += e.score; 
+                                player.money += e.money; 
+                                showFloatingText(`+$${e.money}`, e.x, e.y, '#0f0'); 
                                 enemies.splice(j, 1);
-                            } else {
-                                createExplosion(b.x, b.y, '#fff');
-                            }
+                            } else { createExplosion(b.x, b.y, '#fff'); }
                             break;
+                        }
+                    }
+                    if (!hit && boss && isBossActive) {
+                        if (b.x < boss.x + boss.w && b.x + b.w > boss.x && b.y < boss.y + boss.h && b.y + b.h > boss.y) {
+                            boss.hp -= damage; bullets.splice(i, 1); hit = true; createExplosion(b.x, b.y, '#fff');
+                            if (boss.hp <= 0) destroyBoss();
                         }
                     }
                 }
             }
 
-            // 5. 아이템 처리
-            for (let i = items.length - 1; i >= 0; i--) {
-                let item = items[i];
-                item.y += item.vy;
-                if (item.y > canvas.height) { items.splice(i, 1); continue; }
+            // 적 총알 처리 + 윙맨 피격
+            for (let i = enemyBullets.length - 1; i >= 0; i--) {
+                let b = enemyBullets[i]; b.x += b.vx; b.y += b.vy;
+                if (b.y > canvas.height || b.x < 0 || b.x > canvas.width) { enemyBullets.splice(i, 1); continue; }
+                
+                let hit = false;
+                
+                // 1. 왼쪽 윙맨 피격 확인
+                if (player.leftWingman) {
+                    if (b.x > player.x - 15 && b.x < player.x - 5 && b.y > player.y + 5 && b.y < player.y + 15) {
+                        player.leftWingman = false;
+                        createExplosion(player.x - 10, player.y + 10, '#0f0');
+                        playSound('explosion');
+                        hit = true;
+                    }
+                }
+                // 2. 오른쪽 윙맨 피격 확인
+                if (!hit && player.rightWingman) {
+                    if (b.x > player.x + player.w + 5 && b.x < player.x + player.w + 15 && b.y > player.y + 5 && b.y < player.y + 15) {
+                        player.rightWingman = false;
+                        createExplosion(player.x + player.w + 10, player.y + 10, '#0f0');
+                        playSound('explosion');
+                        hit = true;
+                    }
+                }
 
-                if (player.x < item.x + item.w && player.x + player.w > item.x &&
-                    player.y < item.y + item.h && player.y + player.h > item.y) {
-                    playSound('powerup');
-                    if (item.type === 'power') {
-                        player.power = Math.min(player.power + 1, 3); 
-                        score += 500;
-                    } else if (item.type === 'bomb') {
-                        player.bombs = Math.min(player.bombs + 1, 5); 
+                // 3. 플레이어 본체 피격
+                if (!hit && player.invulnerable <= 0 && b.x < player.x + player.w && b.x + b.w > player.x && b.y < player.y + player.h && b.y + b.h > player.y) {
+                    createExplosion(player.x + player.w/2, player.y + player.h/2, '#0ff');
+                    player.hp--; 
+                    player.invulnerable = 60; 
+                    hit = true;
+                    if (player.hp <= 0) { gameOver(); return; }
+                }
+                
+                if (hit) enemyBullets.splice(i, 1);
+            }
+
+            // 적 충돌 처리 + 윙맨 충돌
+            for (let i = enemies.length - 1; i >= 0; i--) {
+                let e = enemies[i]; e.tick++;
+                if (e.type === 'sine') e.x += Math.sin(e.tick * 0.1) * 2;
+                e.y += e.speed;
+                if (frameCount % 60 === 0 && Math.random() < 0.1 + (gameLevel * 0.05)) enemyShoot(e);
+                if (e.y > canvas.height) { enemies.splice(i, 1); continue; }
+                
+                let crash = false;
+
+                // 1. 왼쪽 윙맨 충돌
+                if (player.leftWingman) {
+                    if (e.x < player.x - 5 && e.x + e.w > player.x - 15 && e.y < player.y + 15 && e.y + e.h > player.y + 5) {
+                        player.leftWingman = false;
+                        createExplosion(player.x - 10, player.y + 10, '#0f0');
+                        createExplosion(e.x + e.w/2, e.y + e.h/2, '#f00'); // 적도 폭발 (데미지 혹은 파괴)
+                        e.hp -= 5; // 윙맨 희생하여 적에게 큰 데미지
+                        playSound('explosion');
+                        if (e.hp <= 0) { score += e.score; player.money += e.money; enemies.splice(i, 1); crash = true; }
+                    }
+                }
+                // 2. 오른쪽 윙맨 충돌
+                if (!crash && player.rightWingman) {
+                    if (e.x < player.x + player.w + 15 && e.x + e.w > player.x + player.w + 5 && e.y < player.y + 15 && e.y + e.h > player.y + 5) {
+                        player.rightWingman = false;
+                        createExplosion(player.x + player.w + 10, player.y + 10, '#0f0');
+                        createExplosion(e.x + e.w/2, e.y + e.h/2, '#f00');
+                        e.hp -= 5;
+                        playSound('explosion');
+                        if (e.hp <= 0) { score += e.score; player.money += e.money; enemies.splice(i, 1); crash = true; }
+                    }
+                }
+
+                // 3. 플레이어 본체 충돌
+                if (!crash && player.invulnerable <= 0 && player.x < e.x + e.w && player.x + player.w > e.x && player.y < e.y + e.h && player.y + player.h > e.y) {
+                    createExplosion(player.x + player.w/2, player.y + player.h/2, '#0ff'); 
+                    player.hp--; 
+                    player.invulnerable = 60;
+                    if (player.hp <= 0) { gameOver(); return; }
+                }
+            }
+
+            if (boss && isBossActive) {
+                boss.tick++;
+                if (boss.state === 'enter') { boss.y += 1; if (boss.y >= 50) boss.state = 'fight'; } 
+                else {
+                    let moveSpeed = 2;
+                    if (boss.type === 0) moveSpeed = 0.5; else if (boss.type === 2) moveSpeed = 4; 
+                    boss.x += Math.sin(boss.tick * 0.02 * (boss.type + 1)) * moveSpeed; 
+                    bossShoot(boss);
+                }
+                if (player.invulnerable <= 0 && player.x < boss.x + boss.w && player.x + player.w > boss.x && player.y < boss.y + boss.h && player.y + player.h > boss.y) {
+                    createExplosion(player.x + player.w/2, player.y + player.h/2, '#0ff'); 
+                    player.hp--; 
+                    player.invulnerable = 60;
+                    if (player.hp <= 0) { gameOver(); return; }
+                }
+            }
+
+            for (let i = items.length - 1; i >= 0; i--) {
+                let item = items[i]; item.y += item.vy;
+                if (item.y > canvas.height) { items.splice(i, 1); continue; }
+                if (player.x < item.x + item.w && player.x + player.w > item.x && player.y < item.y + item.h && player.y + player.h > item.y) {
+                    
+                    if (item.type === 'shop') {
+                        openShop();
+                    } else {
+                        playSound('coin'); // Coin sound
+                        if (item.type === 'coin') { 
+                            player.money += 200; // Coin item gives $200
+                            showFloatingText("+$200", player.x, player.y, '#ff0');
+                        } else if (item.type === 'bomb') { 
+                            player.bombs = Math.min(player.bombs + 1, 5); 
+                            showFloatingText("BOMB!", player.x, player.y, '#00f');
+                        } 
                     }
                     items.splice(i, 1);
                 }
             }
 
-            // 6. 적 충돌
-            for (let i = enemies.length - 1; i >= 0; i--) {
-                let e = enemies[i];
-                e.y += e.speed;
-                if (e.y > canvas.height) { enemies.splice(i, 1); continue; }
-
-                if (player.invulnerable <= 0 && 
-                    player.x < e.x + e.w && player.x + player.w > e.x &&
-                    player.y < e.y + e.h && player.y + player.h > e.y) {
-                    
-                    createExplosion(player.x + player.w/2, player.y + player.h/2, '#0ff');
-                    player.hp--;
-                    if (player.hp <= 0) { gameOver(); return; }
-                }
-            }
-
-            // 7. 파티클
-            for (let i = particles.length - 1; i >= 0; i--) {
-                let p = particles[i];
-                p.x += p.vx; p.y += p.vy; p.life -= 0.05;
-                if (p.life <= 0) particles.splice(i, 1);
+            for (let i = particles.length - 1; i >= 0; i--) { let p = particles[i]; p.x += p.vx; p.y += p.vy; p.life -= 0.05; if (p.life <= 0) particles.splice(i, 1); }
+            for (let i = floatingTexts.length - 1; i >= 0; i--) {
+                let ft = floatingTexts[i]; ft.y += ft.vy; ft.life--;
+                if (ft.life <= 0) floatingTexts.splice(i, 1);
             }
 
             if(player.invulnerable > 0) player.invulnerable--;
             frameCount++;
-
             draw();
             animationId = requestAnimationFrame(update);
         }
 
         function shootBullet() {
-            playSound('shoot');
-            const bulletSpeed = -8;
+            const speed = -8;
             
-            bullets.push({
-                x: player.x + player.w / 2 - 2, y: player.y,
-                w: 4, h: 10, vy: bulletSpeed, vx: 0,
-                color: '#ff0', isPlayer: true
-            });
-
-            if (player.power >= 2) {
-                bullets.push({
-                    x: player.x, y: player.y + 5,
-                    w: 4, h: 10, vy: bulletSpeed, vx: -1,
-                    color: '#ff0', isPlayer: true
-                });
-                bullets.push({
-                    x: player.x + player.w - 4, y: player.y + 5,
-                    w: 4, h: 10, vy: bulletSpeed, vx: 1,
-                    color: '#ff0', isPlayer: true
-                });
+            // 플레이어 미사일
+            if (player.weaponType === 1) { // WIDE
+                playSound('shoot');
+                bullets.push({ x: player.x + player.w/2 - 2, y: player.y, w: 4, h: 10, vy: speed, vx: 0, color: '#f0f', isPlayer: true, damage: 1 });
+                if (player.power >= 2) {
+                    bullets.push({ x: player.x, y: player.y + 5, w: 4, h: 10, vy: speed, vx: -1.5, color: '#f0f', isPlayer: true, damage: 1 });
+                    bullets.push({ x: player.x + player.w - 4, y: player.y + 5, w: 4, h: 10, vy: speed, vx: 1.5, color: '#f0f', isPlayer: true, damage: 1 });
+                }
+                if (player.power >= 3) {
+                    bullets.push({ x: player.x - 5, y: player.y + 10, w: 4, h: 10, vy: speed, vx: -3, color: '#f0f', isPlayer: true, damage: 1 });
+                    bullets.push({ x: player.x + player.w + 1, y: player.y + 10, w: 4, h: 10, vy: speed, vx: 3, color: '#f0f', isPlayer: true, damage: 1 });
+                }
+            } else if (player.weaponType === 2) { // HEAVY
+                playSound('heavy');
+                bullets.push({ x: player.x + player.w/2 - 3, y: player.y, w: 6, h: 15, vy: -10, vx: 0, color: '#0ff', isPlayer: true, damage: 2 });
+                if (player.power >= 2) {
+                    bullets.push({ x: player.x + player.w/2 - 8, y: player.y + 5, w: 6, h: 15, vy: -10, vx: 0, color: '#0ff', isPlayer: true, damage: 2 });
+                    bullets.push({ x: player.x + player.w/2 + 2, y: player.y + 5, w: 6, h: 15, vy: -10, vx: 0, color: '#0ff', isPlayer: true, damage: 2 });
+                }
+                if (player.power >= 3) {
+                    bullets.push({ x: player.x + player.w/2 - 5, y: player.y - 10, w: 10, h: 30, vy: -12, vx: 0, color: '#fff', isPlayer: true, damage: 5 });
+                }
+            } else { // NORMAL
+                playSound('shoot');
+                bullets.push({ x: player.x + player.w / 2 - 2, y: player.y, w: 4, h: 10, vy: speed, vx: 0, color: '#ff0', isPlayer: true, damage: 1 });
+                if (player.power >= 2) { bullets.push({ x: player.x, y: player.y + 5, w: 4, h: 10, vy: speed, vx: -1, color: '#ff0', isPlayer: true, damage: 1 }); bullets.push({ x: player.x + player.w - 4, y: player.y + 5, w: 4, h: 10, vy: speed, vx: 1, color: '#ff0', isPlayer: true, damage: 1 }); }
+                if (player.power >= 3) { bullets.push({ x: player.x - 5, y: player.y + 10, w: 4, h: 10, vy: speed, vx: -2, color: '#f0f', isPlayer: true, damage: 1 }); bullets.push({ x: player.x + player.w + 1, y: player.y + 10, w: 4, h: 10, vy: speed, vx: 2, color: '#f0f', isPlayer: true, damage: 1 }); }
             }
 
-            if (player.power >= 3) {
-                 bullets.push({
-                    x: player.x - 5, y: player.y + 10,
-                    w: 4, h: 10, vy: bulletSpeed, vx: -2, 
-                    color: '#f0f', isPlayer: true
-                });
-                bullets.push({
-                    x: player.x + player.w + 1, y: player.y + 10,
-                    w: 4, h: 10, vy: bulletSpeed, vx: 2, 
-                    color: '#f0f', isPlayer: true
-                });
+            // 꼬마 비행기 (Wingman) 미사일 (살아있을 때만 발사)
+            if (player.leftWingman) {
+                bullets.push({ x: player.x - 12, y: player.y + 10, w: 3, h: 8, vy: speed, vx: 0, color: '#0f0', isPlayer: true, damage: 1 });
             }
+            if (player.rightWingman) {
+                bullets.push({ x: player.x + player.w + 9, y: player.y + 10, w: 3, h: 8, vy: speed, vx: 0, color: '#0f0', isPlayer: true, damage: 1 });
+            }
+        }
+
+        function drawBoss(b) {
+            ctx.fillStyle = b.color;
+            ctx.fillRect(b.x, b.y, b.w, b.h);
+            ctx.fillStyle = 'rgba(0,0,0,0.3)';
+            if (b.type === 0) { 
+                ctx.fillRect(b.x + 10, b.y + 10, b.w - 20, b.h - 20); 
+                ctx.fillStyle = '#050'; ctx.fillRect(b.x + b.w/2 - 5, b.y + b.h, 10, 10); 
+            } else if (b.type === 2) { 
+                ctx.beginPath(); ctx.moveTo(b.x, b.y); ctx.lineTo(b.x + b.w, b.y); ctx.lineTo(b.x + b.w/2, b.y + b.h + 10); ctx.fill();
+            } else { 
+                ctx.fillStyle = '#900';
+                ctx.beginPath(); ctx.moveTo(b.x, b.y + 10); ctx.lineTo(b.x - 20, b.y + 30); ctx.lineTo(b.x, b.y + 50); ctx.fill();
+                ctx.beginPath(); ctx.moveTo(b.x + b.w, b.y + 10); ctx.lineTo(b.x + b.w + 20, b.y + 30); ctx.lineTo(b.x + b.w, b.y + 50); ctx.fill();
+            }
+            if (frameCount % 20 < 10) {
+                ctx.fillStyle = '#fff'; ctx.beginPath(); ctx.arc(b.x + b.w/2, b.y + b.h/2, 5, 0, Math.PI*2); ctx.fill();
+            }
+            const hpPercent = b.hp / b.maxHp;
+            ctx.fillStyle = '#500'; ctx.fillRect(10, 10, canvas.width - 20, 10);
+            ctx.fillStyle = b.color; ctx.fillRect(10, 10, (canvas.width - 20) * hpPercent, 10);
+            ctx.strokeStyle = '#fff'; ctx.lineWidth = 1; ctx.strokeRect(10, 10, canvas.width - 20, 10);
         }
 
         function draw() {
-            ctx.fillStyle = '#000020';
+            ctx.fillStyle = warningTimer > 0 && Math.floor(warningTimer / 10) % 2 === 0 ? '#500' : '#000020'; 
             ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-            ctx.fillStyle = '#aaa';
-            stars.forEach(star => ctx.fillRect(star.x, star.y, star.size, star.size));
+            ctx.fillStyle = '#aaa'; stars.forEach(star => ctx.fillRect(star.x, star.y, star.size, star.size));
 
-            items.forEach(item => {
-                ctx.fillStyle = item.color;
-                ctx.fillRect(item.x, item.y, item.w, item.h);
-                ctx.fillStyle = '#fff';
-                ctx.font = '10px "Press Start 2P"';
-                ctx.fillText(item.type === 'power' ? 'P' : 'B', item.x + 3, item.y + 12);
-                
-                if (Math.floor(Date.now() / 100) % 2 === 0) {
-                    ctx.strokeStyle = '#fff';
-                    ctx.strokeRect(item.x, item.y, item.w, item.h);
-                }
+            if (warningTimer > 0) {
+                ctx.fillStyle = 'red'; ctx.font = '30px "Press Start 2P"'; ctx.textAlign = 'center';
+                if (Math.floor(warningTimer / 20) % 2 === 0) ctx.fillText("WARNING", canvas.width/2, canvas.height/2);
+            }
+
+            items.forEach(item => { 
+                ctx.fillStyle = item.color; ctx.fillRect(item.x, item.y, item.w, item.h); ctx.fillStyle = '#fff'; ctx.font = '10px "Press Start 2P"'; 
+                // 아이템 텍스트
+                let txt = '$'; // Coin
+                if(item.type === 'bomb') txt = 'B';
+                else if(item.type === 'shop') txt = 'S';
+                ctx.fillText(txt, item.x + 3, item.y + 12); 
             });
 
             if (player.invulnerable % 4 < 2) {
-                ctx.fillStyle = '#0ff';
-                ctx.beginPath();
-                ctx.moveTo(player.x + player.w/2, player.y);
-                ctx.lineTo(player.x + player.w, player.y + player.h);
-                ctx.lineTo(player.x + player.w/2, player.y + player.h - 5);
-                ctx.lineTo(player.x, player.y + player.h);
-                ctx.closePath();
-                ctx.fill();
-                ctx.fillStyle = `rgba(255, 100, 0, ${Math.random()})`;
-                ctx.fillRect(player.x + player.w/2 - 2, player.y + player.h - 2, 4, 8);
+                ctx.fillStyle = '#0ff'; ctx.beginPath(); ctx.moveTo(player.x + player.w/2, player.y); ctx.lineTo(player.x + player.w, player.y + player.h); ctx.lineTo(player.x + player.w/2, player.y + player.h - 5); ctx.lineTo(player.x, player.y + player.h); ctx.closePath(); ctx.fill();
+                ctx.fillStyle = `rgba(255, 100, 0, ${Math.random()})`; ctx.fillRect(player.x + player.w/2 - 2, player.y + player.h - 2, 4, 8);
+                
+                // 꼬마 비행기 그리기 (살아있을 때만)
+                if (player.leftWingman) {
+                    ctx.fillStyle = '#0f0';
+                    ctx.beginPath();
+                    ctx.moveTo(player.x - 15, player.y + 5);
+                    ctx.lineTo(player.x - 5, player.y + 5);
+                    ctx.lineTo(player.x - 10, player.y + 15);
+                    ctx.fill();
+                }
+                if (player.rightWingman) {
+                    ctx.fillStyle = '#0f0';
+                    ctx.beginPath();
+                    ctx.moveTo(player.x + player.w + 5, player.y + 5);
+                    ctx.lineTo(player.x + player.w + 15, player.y + 5);
+                    ctx.lineTo(player.x + player.w + 10, player.y + 15);
+                    ctx.fill();
+                }
             }
 
-            enemies.forEach(e => {
-                ctx.fillStyle = e.color;
-                ctx.beginPath();
-                ctx.moveTo(e.x, e.y);
-                ctx.lineTo(e.x + e.w, e.y);
-                ctx.lineTo(e.x + e.w/2, e.y + e.h);
-                ctx.closePath();
-                ctx.fill();
-                ctx.fillStyle = 'rgba(0,0,0,0.3)';
-                ctx.fillRect(e.x + 2, e.y + 2, e.w, e.h);
-            });
+            enemies.forEach(e => { ctx.fillStyle = e.color; ctx.beginPath(); ctx.moveTo(e.x, e.y); ctx.lineTo(e.x + e.w, e.y); ctx.lineTo(e.x + e.w/2, e.y + e.h); ctx.closePath(); ctx.fill(); });
+            
+            if (boss && isBossActive) drawBoss(boss);
 
             bullets.forEach(b => { ctx.fillStyle = b.color; ctx.fillRect(b.x, b.y, b.w, b.h); });
+            enemyBullets.forEach(b => { ctx.fillStyle = b.color; ctx.beginPath(); ctx.arc(b.x, b.y, b.w/2, 0, Math.PI*2); ctx.fill(); });
 
-            particles.forEach(p => {
-                ctx.globalAlpha = p.life;
-                ctx.fillStyle = p.color;
-                ctx.fillRect(p.x, p.y, p.size, p.size);
-                ctx.globalAlpha = 1.0;
+            particles.forEach(p => { ctx.globalAlpha = p.life; ctx.fillStyle = p.color; ctx.fillRect(p.x, p.y, p.size, p.size); ctx.globalAlpha = 1.0; });
+            
+            floatingTexts.forEach(ft => {
+                 ctx.globalAlpha = ft.life / 60;
+                 ctx.fillStyle = ft.color;
+                 ctx.font = '10px "Press Start 2P"';
+                 ctx.fillText(ft.text, ft.x, ft.y);
+                 ctx.globalAlpha = 1.0;
             });
 
-            ctx.textAlign = 'left';
-            ctx.fillStyle = '#fff';
-            ctx.font = '10px "Press Start 2P"';
+            // UI
+            ctx.textAlign = 'left'; ctx.fillStyle = '#fff'; ctx.font = '10px "Press Start 2P"'; 
             ctx.fillText(`SCORE: ${score}`, 10, 20);
-            
-            ctx.textAlign = 'right';
-            ctx.fillStyle = '#00f'; 
-            ctx.fillText(`BOMB: ${player.bombs}`, canvas.width - 10, canvas.height - 10);
+            ctx.fillStyle = '#0f0';
+            ctx.fillText(`CREDIT: $${player.money}`, 10, 35); // 돈 표시
 
-            // Auto Fire 표시
-            if (isAutoFire) {
-                ctx.fillStyle = '#ff0';
-                ctx.fillText('AUTO ON', canvas.width - 10, 35);
+            ctx.textAlign = 'right'; ctx.fillStyle = '#00f'; ctx.fillText(`BOMB: ${player.bombs}`, canvas.width - 10, 20);
+            if (isAutoFire) { ctx.fillStyle = '#ff0'; ctx.fillText('AUTO ON', canvas.width - 10, 50); }
+
+            // HP UI (Energy)
+            ctx.textAlign = 'right'; 
+            let hpStr = '';
+            for(let k=0; k<player.maxHp; k++) {
+                hpStr += (k < player.hp) ? '♥' : '♡';
             }
+            ctx.fillStyle = '#f00';
+            ctx.fillText(`HP:${hpStr}`, canvas.width - 10, 35);
         }
 
         function gameOver() {
-            gameRunning = false;
-            cancelAnimationFrame(animationId);
-            playSound('explosion');
-
-            if (score > highScore) { 
-                highScore = score; 
-                localStorage.setItem(STORAGE_KEYS.HIGH_SCORE, highScore); 
-            }
+            gameRunning = false; cancelAnimationFrame(animationId); playSound('explosion');
+            if (score > highScore) { highScore = score; localStorage.setItem(STORAGE_KEYS.HIGH_SCORE, highScore); }
             startHighScoreDisplay.innerText = highScore;
-
             let lowestScore = rankings.length < 5 ? 0 : rankings[rankings.length - 1].score;
-            if (score > lowestScore) {
-                nrRankDisplay.innerText = getPotentialRank(score);
-                initialsInput.value = '';
-                showScreen(screenNewRecord);
-                setTimeout(() => initialsInput.focus(), 500);
-            } else {
-                goScoreDisplay.innerText = score;
-                renderRankings(gameoverRankingList);
-                showScreen(screenGameOver);
-            }
+            if (score > lowestScore) { nrRankDisplay.innerText = getPotentialRank(score); initialsInput.value = ''; showScreen(screenNewRecord); setTimeout(() => initialsInput.focus(), 500); }
+            else { goScoreDisplay.innerText = score; renderRankings(gameoverRankingList); showScreen(screenGameOver); }
         }
 
         function getPotentialRank(score) {
-            let tempRankings = [...rankings, { score: score }];
-            tempRankings.sort((a, b) => b.score - a.score);
-            return tempRankings.findIndex(r => r.score === score) + 1;
+            let tempRankings = [...rankings, { score: score }]; tempRankings.sort((a, b) => b.score - a.score); return tempRankings.findIndex(r => r.score === score) + 1;
         }
 
-        /* --- 입력 처리 --- */
         document.addEventListener('keydown', e => {
-            if (keys.hasOwnProperty(e.key) || keys.hasOwnProperty(e.code)) {
-                keys[e.key] = true;
-                if(e.key === 'x' || e.key === 'X') useBomb(); 
-                if(e.key === 'b' || e.key === 'B') isAutoFire = !isAutoFire; // B키로 자동 발사 토글
+            let key = e.key;
+            if (key === ' ') key = 'Space'; 
+
+            if (keys.hasOwnProperty(key) || keys.hasOwnProperty(e.code)) { 
+                keys[key] = true; 
+                if(key === 'x' || key === 'X') useBomb(); 
+                if(key === 'b' || key === 'B') isAutoFire = !isAutoFire; 
+                if(key === 'Space') isAutoFire = !isAutoFire; 
             }
-            if (e.key === 'Enter') handleActionBtn();
+            if (e.key === 'Enter') {
+                if (screenShop.classList.contains('active')) closeShop(); // 상점에서 엔터 시 나가기
+                else if (screenStart.classList.contains('active')) startGame();
+                else if (screenGameOver.classList.contains('active')) startGame();
+            }
         });
-        document.addEventListener('keyup', e => {
-            if (keys.hasOwnProperty(e.key) || keys.hasOwnProperty(e.code)) keys[e.key] = false;
+        document.addEventListener('keyup', e => { 
+            let key = e.key;
+            if (key === ' ') key = 'Space'; 
+            if (keys.hasOwnProperty(key) || keys.hasOwnProperty(e.code)) keys[key] = false; 
         });
 
-        // 가상 컨트롤러
         const dpadVisualH = document.getElementById('dpad-h-visual');
         const dpadVisualV = document.getElementById('dpad-v-visual');
         function bindDpad(btnId, keyName, visualEl) {
             const btn = document.getElementById(btnId);
             const startAction = (e) => { e.preventDefault(); keys[keyName] = true; if(visualEl) visualEl.classList.add('active'); };
             const endAction = (e) => { e.preventDefault(); keys[keyName] = false; if(visualEl) visualEl.classList.remove('active'); };
-            btn.addEventListener('touchstart', startAction, {passive:false});
-            btn.addEventListener('touchend', endAction);
-            btn.addEventListener('mousedown', startAction);
-            btn.addEventListener('mouseup', endAction);
-            btn.addEventListener('mouseleave', endAction);
+            btn.addEventListener('touchstart', startAction, {passive:false}); btn.addEventListener('touchend', endAction); btn.addEventListener('mousedown', startAction); btn.addEventListener('mouseup', endAction); btn.addEventListener('mouseleave', endAction);
         }
-        bindDpad('btn-left', 'ArrowLeft', dpadVisualH);
-        bindDpad('btn-right', 'ArrowRight', dpadVisualH);
-        bindDpad('btn-up', 'ArrowUp', dpadVisualV);
-        bindDpad('btn-down', 'ArrowDown', dpadVisualV);
+        bindDpad('btn-left', 'ArrowLeft', dpadVisualH); bindDpad('btn-right', 'ArrowRight', dpadVisualH); bindDpad('btn-up', 'ArrowUp', dpadVisualV); bindDpad('btn-down', 'ArrowDown', dpadVisualV);
 
-        // 액션 버튼
         function bindAction(btnId, actionFn, isHold = false) {
             const btn = document.getElementById(btnId);
-            const startAction = (e) => {
-                e.preventDefault();
-                btn.classList.add('active');
-                if (isHold) { keys.Space = true; shootBullet(); } else { actionFn(); }
-            };
-            const endAction = (e) => {
-                e.preventDefault();
-                btn.classList.remove('active');
-                if (isHold) keys.Space = false;
-            };
-            btn.addEventListener('touchstart', startAction, {passive:false});
-            btn.addEventListener('touchend', endAction);
-            btn.addEventListener('mousedown', startAction);
-            btn.addEventListener('mouseup', endAction);
+            const startAction = (e) => { e.preventDefault(); btn.classList.add('active'); if (isHold) { keys.Space = true; shootBullet(); } else { actionFn(); } };
+            const endAction = (e) => { e.preventDefault(); btn.classList.remove('active'); if (isHold) keys.Space = false; };
+            btn.addEventListener('touchstart', startAction, {passive:false}); btn.addEventListener('touchend', endAction); btn.addEventListener('mousedown', startAction); btn.addEventListener('mouseup', endAction);
         }
-
-        bindAction('btn-a', () => {}, true); // FIRE (Hold)
-        
-        // AUTO 버튼 (Toggle)
-        const btnB = document.getElementById('btn-b');
-        btnB.addEventListener('touchstart', (e) => { e.preventDefault(); isAutoFire = !isAutoFire; btnB.classList.toggle('active'); });
-        btnB.addEventListener('mousedown', (e) => { e.preventDefault(); isAutoFire = !isAutoFire; btnB.classList.toggle('active'); });
-
-        bindAction('btn-x', () => { useBomb(); }); // BOMB
-        
-        // Y 버튼 (Menu/Select)
-        const btnY = document.getElementById('btn-y');
-        const handleY = (e) => { e.preventDefault(); handleActionBtn(); };
-        btnY.addEventListener('mousedown', handleY);
-        btnY.addEventListener('touchstart', handleY);
+        bindAction('btn-a', () => {}, true);
+        const btnB = document.getElementById('btn-b'); btnB.addEventListener('touchstart', (e) => { e.preventDefault(); isAutoFire = !isAutoFire; btnB.classList.toggle('active'); }); btnB.addEventListener('mousedown', (e) => { e.preventDefault(); isAutoFire = !isAutoFire; btnB.classList.toggle('active'); });
+        bindAction('btn-x', () => { useBomb(); });
+        const btnY = document.getElementById('btn-y'); const handleY = (e) => { e.preventDefault(); if(screenShop.classList.contains('active')) closeShop(); else handleActionBtn(); }; btnY.addEventListener('mousedown', handleY); btnY.addEventListener('touchstart', handleY);
 
         function handleActionBtn() {
-            if (screenStart.classList.contains('active')) startGame();
-            else if (screenGameOver.classList.contains('active')) startGame();
-            else if (screenRanking.classList.contains('active')) showScreen(screenStart);
-            else if (screenNewRecord.classList.contains('active')) submitScoreBtn.click();
+            if (screenStart.classList.contains('active')) startGame(); else if (screenGameOver.classList.contains('active')) startGame(); else if (screenRanking.classList.contains('active')) showScreen(screenStart); else if (screenNewRecord.classList.contains('active')) submitScoreBtn.click();
         }
 
-        startBtn.addEventListener('click', startGame);
-        viewRankingBtn.addEventListener('click', () => { renderRankings(rankingList); showScreen(screenRanking); });
-        retryBtn.addEventListener('click', startGame);
-        goHomeBtn.addEventListener('click', () => { showScreen(screenStart); });
-        backBtn.addEventListener('click', () => { showScreen(screenStart); });
+        startBtn.addEventListener('click', startGame); viewRankingBtn.addEventListener('click', () => { renderRankings(rankingList); showScreen(screenRanking); }); retryBtn.addEventListener('click', startGame); goHomeBtn.addEventListener('click', () => { showScreen(screenStart); }); backBtn.addEventListener('click', () => { showScreen(screenStart); });
         submitScoreBtn.addEventListener('click', () => {
-            const initials = initialsInput.value.trim().toUpperCase() || 'ACE';
-            rankings.push({ name: initials, score: score });
-            rankings.sort((a, b) => b.score - a.score);
-            rankings.slice(0, 5);
-            localStorage.setItem(STORAGE_KEYS.RANKINGS, JSON.stringify(rankings));
-            renderRankings(rankingList);
-            showScreen(screenRanking);
+            const initials = initialsInput.value.trim().toUpperCase() || 'ACE'; rankings.push({ name: initials, score: score }); rankings.sort((a, b) => b.score - a.score); rankings.slice(0, 5); localStorage.setItem(STORAGE_KEYS.RANKINGS, JSON.stringify(rankings)); renderRankings(rankingList); showScreen(screenRanking);
         });
-
     </script>
 </body>
 </html>
